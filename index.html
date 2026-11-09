@@ -25,8 +25,6 @@
     </script>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for Admin & Final Results -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         html, body {
@@ -43,16 +41,7 @@
             background-color: #fff9e6; /* Fondo beis cálido */
         }
         .island-bg {
-            background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 50%, #0ea5e9 100%); /* Océano celeste brillante */
-        }
-        .gold-glow {
-            box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
-        }
-        .gold-glow-lg {
-            box-shadow: 0 8px 25px rgba(234, 179, 8, 0.6);
-        }
-        .emerald-glow {
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 50%, #0ea5e9 100%);
         }
         /* Custom Scrollbars */
         ::-webkit-scrollbar {
@@ -69,20 +58,12 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #fbbf24;
         }
-        /* Keyframe animations */
         @keyframes pulse-subtle {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.03); opacity: 0.9; }
         }
         .animate-pulse-subtle {
             animation: pulse-subtle 3s infinite ease-in-out;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-        .animate-float {
-            animation: float 4s infinite ease-in-out;
         }
         .chest-bounce {
             animation: bounce 0.6s cubic-bezier(0.36, 0, 0.66, -0.56) alternate infinite;
@@ -140,8 +121,8 @@
 
     <!-- FOOTER -->
     <footer class="w-full bg-white border-t-4 border-amber-200 py-4 px-4 text-center text-xs text-slate-500 font-medium">
-        <p>REWARD ISLAND &copy; 2026 — Herramienta Experimental Educativa.</p>
-        <p class="mt-1 text-slate-400">No constituye un diagnóstico clínico o evaluación médica validada.</p>
+        <p>REWARD ISLAND &copy; 2026 — Herramienta Experimental Educativa de Evaluación Conductual.</p>
+        <p class="mt-1 text-slate-400">No constituye un diagnóstico clínico ni una prueba psicométrica normatizada.</p>
     </footer>
 
     <!-- MODAL CONTAINER -->
@@ -153,32 +134,24 @@
 
     <!-- MAIN APPLICATION LOGIC SCRIPT -->
     <script>
-        /**
-         * REWARD ISLAND - Behavioral Assessment Engine
-         * Implements Gray's BAS Dimensions: Reward Responsiveness, Drive/Persistence, Fun/Novelty Seeking, Reward Anticipation.
-         */
-
-        // ==========================================
-        // STATE MANAGEMENT & GLOBAL VARIABLES
-        // ==========================================
-        const ADMIN_PASSWORD = "admin"; // Evaluator access key
+        const ADMIN_PASSWORD = "admin";
         
         let appState = {
             participantId: null,
             startTime: null,
             endTime: null,
-            currentPhase: 0, // 0: Start/Consent, 1: Map Phase 1, 2: Phase 2, 3: Phase 3, 4: Phase 4, 5: Results
+            currentPhase: 0,
             points: 0,
             completedPhases: [false, false, false, false],
             responses: {
-                phase1: [], // Anticipation (Mag vs Prob choices)
-                phase2: [], // Drive & Effort (Easy vs Hard math/symbol choices)
-                phase3: [], // Reward Responsiveness (Speed/Persistence post win/loss)
-                phase4: []  // Novelty Seeking (Known vs Unknown choices)
+                phase1: [], // Anticipation & Expected Value Choices
+                phase2: [], // Drive, Effort & Persistence
+                phase3: [], // Post-Reward Behavioral Responsiveness
+                phase4: []  // Exploration & Novelty Seeking
             }
         };
 
-        // Audio Synth Engine (Zero external audio assets required)
+        // Web Audio Synth Engine
         const AudioFX = {
             ctx: null,
             init() {
@@ -197,8 +170,8 @@
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(987.77, now); // B5
-                    osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+                    osc.frequency.setValueAtTime(987.77, now);
+                    osc.frequency.setValueAtTime(1318.51, now + 0.08);
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
                     osc.connect(gain);
@@ -244,7 +217,6 @@
             }
         };
 
-        // Unlock audio context on touch for iOS Safari
         window.addEventListener('touchstart', function unlockAudio() {
             AudioFX.init();
             window.removeEventListener('touchstart', unlockAudio);
@@ -254,9 +226,7 @@
             window.removeEventListener('click', unlockAudioClick);
         }, { once: true });
 
-        // ==========================================
-        // STORAGE & DATA PERSISTENCE
-        // ==========================================
+        // Storage Engine
         const StorageManager = {
             STORAGE_KEY: 'REWARD_ISLAND_USER_SESSION',
             ALL_DATA_KEY: 'REWARD_ISLAND_ALL_SESSIONS_LOG',
@@ -269,9 +239,7 @@
                 try {
                     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(appState));
                     this.saveToGlobalLog(appState);
-                } catch(e) {
-                    console.error("Save error", e);
-                }
+                } catch(e) {}
             },
 
             loadCurrentState() {
@@ -307,9 +275,6 @@
             }
         };
 
-        // ==========================================
-        // INITIALIZATION & SCREEN ROUTING
-        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const savedState = StorageManager.loadCurrentState();
             if (savedState && savedState.participantId && savedState.currentPhase > 0 && savedState.currentPhase < 5) {
@@ -360,7 +325,7 @@
                         <i class="fa-solid fa-rotate-left"></i>
                     </div>
                     <h3 class="text-2xl font-black text-slate-800 mb-2">Partida Encontrada</h3>
-                    <p class="text-sm text-slate-600 mb-6 font-medium">Tienes una aventura anterior guardada (ID: <span class="font-bold text-sky-600">${savedState.participantId}</span>). ¿Deseas continuar en el Territorio ${savedState.currentPhase} o comenzar una nueva?</p>
+                    <p class="text-sm text-slate-600 mb-6 font-medium">Tienes una sesión guardada (ID: <span class="font-bold text-sky-600">${savedState.participantId}</span>). ¿Deseas continuar en el Territorio ${savedState.currentPhase}?</p>
                     <div class="flex flex-col sm:flex-row gap-3 justify-center">
                         <button onclick="resumeSession()" class="btn-game px-5 py-3 bg-green-400 hover:bg-green-300 text-green-950 border-green-600 font-bold rounded-2xl shadow-sm transition">
                             <i class="fa-solid fa-play mr-2"></i> Continuar Aventura
@@ -388,20 +353,14 @@
         }
 
         // ==========================================
-        // VIEW 0: WELCOME & INFORMED CONSENT
+        // VIEW 0: WELCOME & CONSENT
         // ==========================================
         function renderWelcomeScreen() {
             const container = document.getElementById('appContainer');
             container.innerHTML = `
                 <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-10 shadow-2xl text-center relative overflow-hidden">
-                    
-                    <!-- Decorative shapes -->
-                    <div class="absolute -top-10 -left-10 w-32 h-32 bg-yellow-200 rounded-full opacity-50 pointer-events-none"></div>
-                    <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-sky-200 rounded-full opacity-50 pointer-events-none"></div>
-
-                    <!-- Hero Badge -->
                     <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-100 border-2 border-sky-300 text-sky-700 text-xs font-bold mb-6 animate-pulse-subtle">
-                        <i class="fa-solid fa-star text-yellow-500"></i> Aventura Conductual Interactiva
+                        <i class="fa-solid fa-star text-yellow-500"></i> Evaluación Conductual Gamificada
                     </div>
 
                     <h1 class="text-4xl sm:text-6xl font-black text-sky-500 mb-3 tracking-tight" style="text-shadow: 2px 2px 0px #bae6fd;">
@@ -411,27 +370,19 @@
                         «Cada decisión te acerca a un nuevo tesoro»
                     </p>
 
-                    <!-- Island Graphic SVG -->
                     <div class="my-6 mx-auto max-w-sm rounded-3xl bg-sky-50 p-4 border-4 border-sky-200 shadow-sm relative">
-                        <svg class="w-full h-40" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Water/Ocean -->
+                        <svg class="w-full h-40" viewBox="0 0 400 200" fill="none">
                             <path d="M20,160 Q100,140 200,160 T380,160 L400,200 L0,200 Z" fill="#7dd3fc" opacity="0.8"/>
-                            <!-- Sand Base -->
                             <path d="M30,155 Q70,75 160,85 T310,95 Q370,135 360,170 Q200,190 30,155 Z" fill="#fde047"/>
-                            <!-- Green Island Top -->
                             <path d="M40,150 Q70,70 160,80 T300,90 Q360,130 350,165 Q200,185 40,150 Z" fill="#4ade80" stroke="#22c55e" stroke-width="4"/>
-                            <!-- Mountains -->
                             <polygon points="180,90 220,30 260,90" fill="#22c55e" stroke="#16a34a" stroke-width="3"/>
                             <polygon points="210,45 220,30 230,45" fill="#ffffff"/>
-                            <!-- Trees -->
                             <circle cx="100" cy="110" r="16" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
                             <circle cx="125" cy="120" r="20" fill="#22c55e" stroke="#16a34a" stroke-width="2"/>
                             <circle cx="300" cy="120" r="18" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
-                            <!-- Treasure Chest -->
                             <rect x="210" y="140" width="28" height="20" rx="4" fill="#facc15" stroke="#ca8a04" stroke-width="3"/>
                             <path d="M210,150 H238" stroke="#ca8a04" stroke-width="3"/>
                             <circle cx="224" cy="150" r="3" fill="#ffffff"/>
-                            <!-- Dotted path -->
                             <path d="M80,140 Q150,120 200,145" stroke="#ffffff" stroke-width="4" stroke-dasharray="8,8" fill="none"/>
                         </svg>
                     </div>
@@ -439,15 +390,15 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left mb-8">
                         <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-200">
                             <div class="text-yellow-600 font-black mb-1 flex items-center gap-2"><i class="fa-solid fa-clock text-xl"></i> 15 Min</div>
-                            <div class="text-xs text-slate-600 font-medium">Tiempo para completar los 4 territorios.</div>
+                            <div class="text-xs text-slate-600 font-medium">Duración aproximada total.</div>
                         </div>
                         <div class="bg-green-50 p-4 rounded-2xl border-2 border-green-200">
                             <div class="text-green-600 font-black mb-1 flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-xl"></i> 4 Fases</div>
-                            <div class="text-xs text-slate-600 font-medium">Desafíos, cofres y exploración activa.</div>
+                            <div class="text-xs text-slate-600 font-medium">Mapas, esfuerzo, cofres y rutas.</div>
                         </div>
                         <div class="bg-sky-50 p-4 rounded-2xl border-2 border-sky-200">
                             <div class="text-sky-600 font-black mb-1 flex items-center gap-2"><i class="fa-solid fa-user-ninja text-xl"></i> Anónimo</div>
-                            <div class="text-xs text-slate-600 font-medium">Sin datos personales. Privacidad 100%.</div>
+                            <div class="text-xs text-slate-600 font-medium">Sin datos personales guardados.</div>
                         </div>
                     </div>
 
@@ -470,21 +421,19 @@
                         <div class="w-12 h-12 bg-sky-100 text-sky-500 rounded-2xl flex items-center justify-center text-2xl border-2 border-sky-300">
                             <i class="fa-solid fa-clipboard-check"></i>
                         </div>
-                        <h3 class="text-xl font-black text-slate-800">Reglas y Permisos</h3>
+                        <h3 class="text-xl font-black text-slate-800">Consentimiento Informativo</h3>
                     </div>
                     
                     <div class="text-sm text-slate-600 font-medium space-y-3 max-h-60 overflow-y-auto p-4 bg-slate-50 rounded-2xl border-2 border-slate-200">
-                        <p><strong>Objetivo:</strong> Jugarás una aventura interactiva para explorar cómo tomamos decisiones frente a recompensas y desafíos.</p>
-                        <p><strong>Registro:</strong> Se guardarán tus elecciones y tiempos de respuesta de forma automática.</p>
-                        <p><strong>Privacidad total:</strong> Eres el jugador <span class="text-sky-600 font-black bg-sky-100 px-2 py-0.5 rounded-lg border border-sky-200">${appState.participantId}</span>. No pedimos ni guardamos nombres ni correos.</p>
-                        <p><strong>Importante:</strong> Esto es un juego educativo experimental, no una prueba médica ni un diagnóstico psicológico.</p>
-                        <p>Puedes salir del juego cuando quieras cerrando la pestaña.</p>
+                        <p><strong>Objetivo:</strong> Esta experiencia gamificada mide la toma de decisiones y elecciones conductuales ante distintas oportunidades de recompensa.</p>
+                        <p><strong>Registro de datos:</strong> Se guardarán tus elecciones y tiempos de reacción bajo el código anónimo <span class="text-sky-600 font-black bg-sky-100 px-2 py-0.5 rounded border border-sky-200">${appState.participantId}</span>. No se solicitará DNI, nombre ni correo.</p>
+                        <p><strong>Aviso Importante:</strong> Esta herramienta es un instrumento experimental educativo. Las puntuaciones no constituyen un test psicométrico validado ni realizan diagnósticos clínicos.</p>
                     </div>
 
                     <div class="flex items-start gap-3 pt-2 bg-yellow-50 p-3 rounded-xl border border-yellow-200">
                         <input type="checkbox" id="consentCheck" class="mt-1 w-5 h-5 accent-green-500 cursor-pointer">
                         <label for="consentCheck" class="text-xs font-bold text-slate-700 cursor-pointer">
-                            Entiendo las reglas, sé que es anónimo y quiero empezar a jugar.
+                            Acepto participar voluntariamente en esta tarea experimental anónima.
                         </label>
                     </div>
 
@@ -507,7 +456,7 @@
         function confirmConsent() {
             const check = document.getElementById('consentCheck');
             if (!check || !check.checked) {
-                alert("Por favor, marca la casilla de consentimiento para continuar.");
+                alert("Por favor, acepta el consentimiento para continuar.");
                 return;
             }
             closeModal();
@@ -518,7 +467,7 @@
         }
 
         // ==========================================
-        // MAP ROUTER & INTERACTIVE ISLAND VIEW
+        // MAP ROUTER
         // ==========================================
         function renderMap() {
             const container = document.getElementById('appContainer');
@@ -534,47 +483,39 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                         <div>
                             <span class="text-xs font-black text-sky-500 uppercase tracking-widest bg-sky-100 px-3 py-1 rounded-full border border-sky-200">Mapa de la Isla</span>
-                            <h2 class="text-2xl sm:text-4xl font-black text-slate-800 mt-2">Elige tu destino</h2>
+                            <h2 class="text-2xl sm:text-4xl font-black text-slate-800 mt-2">Elige tu territorio</h2>
                         </div>
                         <div class="bg-yellow-100 px-4 py-2 rounded-2xl border-2 border-yellow-300 text-sm font-bold text-yellow-700">
                             Progreso: <span class="text-yellow-600 text-lg">${appState.completedPhases.filter(Boolean).length} / 4</span>
                         </div>
                     </div>
 
-                    <!-- Map SVG Visual -->
                     <div class="relative w-full aspect-[16/9] rounded-3xl border-4 border-sky-300 overflow-hidden shadow-inner island-bg">
                         <svg class="w-full h-full" viewBox="0 0 800 450">
-                            <!-- Ocean details -->
                             <circle cx="150" cy="100" r="40" fill="#bae6fd" opacity="0.4"/>
                             <circle cx="650" cy="350" r="60" fill="#bae6fd" opacity="0.3"/>
                             
-                            <!-- Main Island Base Contour -->
                             <path d="M 120 220 Q 180 80 400 90 T 700 200 Q 750 320 580 380 T 220 370 Q 80 320 120 220 Z" fill="#fde047" stroke="#eab308" stroke-width="8"/>
                             <path d="M 140 215 Q 190 100 390 105 T 680 205 Q 730 310 570 360 T 230 350 Q 100 310 140 215 Z" fill="#4ade80" stroke="#22c55e" stroke-width="4"/>
 
-                            <!-- Map decorations (Trees/Mountains) -->
                             <circle cx="300" cy="150" r="25" fill="#22c55e" stroke="#16a34a" stroke-width="3"/>
-                            <circle cx="330" cy="170" r="20" fill="#16a34a" stroke="#15803d" stroke-width="3"/>
                             <polygon points="500,200 550,100 600,200" fill="#22c55e" stroke="#16a34a" stroke-width="4"/>
                             <polygon points="530,140 550,100 570,140" fill="#ffffff"/>
 
-                            <!-- Dotted connection paths -->
                             <path d="M 220,270 L 340,160 L 520,180 L 600,290" stroke="#ffffff" stroke-width="5" stroke-dasharray="10,10" fill="none"/>
                         </svg>
 
-                        <!-- INTERACTIVE TERRITORY NODES -->
-                        <!-- Territory 1 -->
+                        <!-- Territorio 1 -->
                         <div class="absolute left-[22%] top-[55%] -translate-x-1/2 -translate-y-1/2 text-center">
-                            <button onclick="startPhase(1)" ${appState.completedPhases[0] ? '' : ''} 
-                                class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform hover:scale-110 shadow-md ${appState.completedPhases[0] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
+                            <button onclick="startPhase(1)" class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform hover:scale-110 shadow-md ${appState.completedPhases[0] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
                                 ${appState.completedPhases[0] ? '<i class="fa-solid fa-check"></i>' : '1'}
                             </button>
                             <span class="block mt-3 text-xs font-black bg-white px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-700 shadow-sm">
-                                Mapa del Tesoro
+                                El Mapa del Tesoro
                             </span>
                         </div>
 
-                        <!-- Territory 2 -->
+                        <!-- Territorio 2 -->
                         <div class="absolute left-[40%] top-[30%] -translate-x-1/2 -translate-y-1/2 text-center">
                             <button onclick="startPhase(2)" ${!appState.completedPhases[0] ? 'disabled' : ''} 
                                 class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform ${!appState.completedPhases[0] ? 'bg-slate-200 text-slate-400 border-slate-300 opacity-80 cursor-not-allowed' : appState.completedPhases[1] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
@@ -585,7 +526,7 @@
                             </span>
                         </div>
 
-                        <!-- Territory 3 -->
+                        <!-- Territorio 3 -->
                         <div class="absolute left-[65%] top-[35%] -translate-x-1/2 -translate-y-1/2 text-center">
                             <button onclick="startPhase(3)" ${!appState.completedPhases[1] ? 'disabled' : ''} 
                                 class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform ${!appState.completedPhases[1] ? 'bg-slate-200 text-slate-400 border-slate-300 opacity-80 cursor-not-allowed' : appState.completedPhases[2] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
@@ -596,14 +537,14 @@
                             </span>
                         </div>
 
-                        <!-- Territory 4 -->
+                        <!-- Territorio 4 -->
                         <div class="absolute left-[75%] top-[62%] -translate-x-1/2 -translate-y-1/2 text-center">
                             <button onclick="startPhase(4)" ${!appState.completedPhases[2] ? 'disabled' : ''} 
                                 class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform ${!appState.completedPhases[2] ? 'bg-slate-200 text-slate-400 border-slate-300 opacity-80 cursor-not-allowed' : appState.completedPhases[3] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
                                 ${appState.completedPhases[3] ? '<i class="fa-solid fa-check">' : !appState.completedPhases[2] ? '<i class="fa-solid fa-lock text-xl"></i>' : '4'}
                             </button>
                             <span class="block mt-3 text-xs font-black bg-white px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-700 shadow-sm">
-                                Expedición
+                                La Última Expedición
                             </span>
                         </div>
                     </div>
@@ -611,13 +552,8 @@
                     <div class="mt-6 flex flex-col sm:flex-row justify-between items-center bg-sky-50 p-4 rounded-2xl border-2 border-sky-200 gap-4">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-sky-200 text-sky-600 rounded-full flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-info"></i></div>
-                            <span class="text-sm text-slate-700 font-bold">
-                                Toca el número amarillo saltarín para empezar la siguiente zona.
-                            </span>
+                            <span class="text-sm text-slate-700 font-bold">Toca el número amarillo para iniciar el siguiente territorio.</span>
                         </div>
-                        <button onclick="renderFinalResults()" class="text-xs font-bold text-sky-600 hover:text-sky-500 bg-white px-4 py-2 border-2 border-sky-200 rounded-xl transition shadow-sm">
-                            Ver Mochila
-                        </button>
                     </div>
                 </div>
             `;
@@ -635,15 +571,15 @@
         }
 
         // ==========================================
-        // FASE 1: EL MAPA DEL TESORO (Anticipación)
+        // FASE 1: EL MAPA DEL TESORO (Aproximación a la recompensa)
+        // Balanced Expected Values: Option A EV = Option B EV
         // ==========================================
-        // Measure choice between High Mag/Low Prob vs Low Mag/High Prob or equal probs.
         const phase1Trials = [
-            { trialId: 1, optionA: { points: 5, prob: 0.8, text: "Camino Seguro (Pequeño)" }, optionB: { points: 15, prob: 0.8, text: "Camino Abundante (Grande)" } },
-            { trialId: 2, optionA: { points: 10, prob: 0.9, text: "Sendero Llano" }, optionB: { points: 30, prob: 0.3, text: "Risco Escarpado" } },
-            { trialId: 3, optionA: { points: 5, prob: 0.5, text: "Ruta Oscura" }, optionB: { points: 20, prob: 0.5, text: "Cueva del Oro" } },
-            { trialId: 4, optionA: { points: 15, prob: 0.85, text: "Playa Tranquila" }, optionB: { points: 40, prob: 0.35, text: "Isla Calavera" } },
-            { trialId: 5, optionA: { points: 8, prob: 0.75, text: "Bosque Verde" }, optionB: { points: 25, prob: 0.25, text: "Templo Perdido" } }
+            { trialId: 1, optionA: { points: 10, prob: 0.9, text: "Sendero Seguro" }, optionB: { points: 30, prob: 0.3, text: "Risco Escarpado" } }, // EV = 9
+            { trialId: 2, optionA: { points: 12, prob: 0.75, text: "Ruta Directa" }, optionB: { points: 36, prob: 0.25, text: "Bosque Oscuro" } }, // EV = 9
+            { trialId: 3, optionA: { points: 15, prob: 0.8, text: "Camino Rocoso" }, optionB: { points: 30, prob: 0.4, text: "Cueva del Tesoro" } }, // EV = 12
+            { trialId: 4, optionA: { points: 20, prob: 0.7, text: "Playa Tranquila" }, optionB: { points: 40, prob: 0.35, text: "Isla Calavera" } }, // EV = 14
+            { trialId: 5, optionA: { points: 8, prob: 0.9, text: "Atajo Limpio" }, optionB: { points: 24, prob: 0.3, text: "Valle de Niebla" } }    // EV = 7.2
         ];
         let p1CurrentIdx = 0;
         let p1StartTime = 0;
@@ -670,14 +606,14 @@
                 <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl">
                     <div class="flex justify-between items-center mb-6 border-b-2 border-amber-100 pb-4">
                         <span class="text-xs font-black text-amber-500 uppercase tracking-widest bg-amber-50 px-3 py-1 rounded-full border border-amber-200"><i class="fa-solid fa-map"></i> Territorio 1</span>
-                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Decisión ${p1CurrentIdx + 1} / ${phase1Trials.length}</span>
+                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Elección ${p1CurrentIdx + 1} / ${phase1Trials.length}</span>
                     </div>
 
                     <h3 class="text-2xl font-black text-slate-800 mb-2">Elige un camino a explorar</h3>
-                    <p class="text-sm text-slate-600 font-medium mb-6">Revisa cuántos puntos da el cofre y qué probabilidad tienes de encontrarlo.</p>
+                    <p class="text-sm text-slate-600 font-medium mb-6">Ambas opciones ofrecen oportunidades equilibradas. ¿Cuál prefieres?</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
-                        <!-- Option A Card -->
+                        <!-- Option A -->
                         <div onclick="selectP1Option('A')" class="group cursor-pointer bg-white border-4 border-slate-200 hover:border-yellow-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col items-center text-center relative">
                             <div class="w-20 h-20 rounded-3xl bg-yellow-100 text-yellow-500 border-2 border-yellow-200 flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition">
                                 <i class="fa-solid fa-vault"></i>
@@ -690,10 +626,10 @@
                             <span class="text-sm text-slate-500 font-bold">${Math.round(trial.optionA.prob * 100)}% de Probabilidad</span>
                         </div>
 
-                        <!-- Option B Card -->
+                        <!-- Option B -->
                         <div onclick="selectP1Option('B')" class="group cursor-pointer bg-white border-4 border-slate-200 hover:border-sky-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col items-center text-center relative">
                             <div class="w-20 h-20 rounded-3xl bg-sky-100 text-sky-500 border-2 border-sky-200 flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition">
-                                <i class="fa-solid fa-chest-filled"></i>
+                                <i class="fa-solid fa-box-open"></i>
                             </div>
                             <h4 class="font-black text-xl text-slate-700 mb-1">${trial.optionB.text}</h4>
                             <div class="text-3xl font-black text-sky-500 mb-4 bg-sky-50 px-4 py-1 rounded-xl border border-sky-200">+${trial.optionB.points} Pts</div>
@@ -737,10 +673,10 @@
                         <i class="fa-solid ${success ? 'fa-coins' : 'fa-box-open'}"></i>
                     </div>
                     <h3 class="text-3xl font-black ${success ? 'text-yellow-500' : 'text-slate-500'} mb-2">
-                        ${success ? '¡Encontraste Oro!' : 'Cofre Vacío'}
+                        ${success ? '¡Encontraste Tesoro!' : 'Cofre Vacío'}
                     </h3>
                     <p class="text-base text-slate-600 font-medium mb-8">
-                        ${success ? `¡Genial! Añades <strong class="text-yellow-600 bg-yellow-100 px-2 py-1 rounded-lg text-lg">+${pointsEarned} puntos</strong> a tu mochila.` : 'No hubo suerte esta vez. ¡Sigue explorando!'}
+                        ${success ? `Añades <strong class="text-yellow-600 bg-yellow-100 px-2 py-1 rounded-lg text-lg">+${pointsEarned} puntos</strong>.` : 'Esta ruta no tenía recompensas esta vez.'}
                     </p>
                     <button onclick="nextP1Trial()" class="btn-game w-full py-4 bg-green-400 hover:bg-green-300 text-green-950 text-lg font-black border-green-600 rounded-2xl transition">
                         Continuar <i class="fa-solid fa-arrow-right ml-1"></i>
@@ -756,11 +692,12 @@
 
         // ==========================================
         // FASE 2: EL DESAFÍO (Motivación y Esfuerzo)
+        // Track: initiation, accuracy, completion, effort choice, abandons
         // ==========================================
         const phase2Trials = [
-            { trialId: 1, easy: { count: 3, points: 5 }, hard: { count: 8, points: 15 } },
+            { trialId: 1, easy: { count: 4, points: 6 }, hard: { count: 10, points: 18 } },
             { trialId: 2, easy: { count: 4, points: 6 }, hard: { count: 10, points: 18 } },
-            { trialId: 3, easy: { count: 3, points: 5 }, hard: { count: 9, points: 20 } }
+            { trialId: 3, easy: { count: 4, points: 6 }, hard: { count: 10, points: 18 } }
         ];
         let p2CurrentTrialIdx = 0;
         let p2ChoiceStartTime = 0;
@@ -776,7 +713,7 @@
                 appState.completedPhases[1] = true;
                 appState.currentPhase = 3;
                 StorageManager.saveCurrentState();
-                showPhaseCompleteModal("¡Desafíos Superados!", "Has demostrado tu fuerza en el segundo territorio.", () => renderMap());
+                showPhaseCompleteModal("¡Desafíos Superados!", "Has completado la zona de esfuerzo.", () => renderMap());
                 return;
             }
 
@@ -788,19 +725,19 @@
                 <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl">
                     <div class="flex justify-between items-center mb-6 border-b-2 border-amber-100 pb-4">
                         <span class="text-xs font-black text-amber-500 uppercase tracking-widest bg-amber-50 px-3 py-1 rounded-full border border-amber-200"><i class="fa-solid fa-dumbbell"></i> Territorio 2</span>
-                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Prueba ${p2CurrentTrialIdx + 1} / ${phase2Trials.length}</span>
+                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Desafío ${p2CurrentTrialIdx + 1} / ${phase2Trials.length}</span>
                     </div>
 
-                    <h3 class="text-2xl font-black text-slate-800 mb-2">¿Qué desafío quieres intentar?</h3>
-                    <p class="text-sm text-slate-600 font-medium mb-6">Elige entre una tarea rápida o una más larga con mejor recompensa.</p>
+                    <h3 class="text-2xl font-black text-slate-800 mb-2">Selecciona un tipo de desafío</h3>
+                    <p class="text-sm text-slate-600 font-medium mb-6">Elige el nivel de esfuerzo que deseas invertir para obtener puntos.</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
-                        <!-- Easy Option -->
+                        <!-- Easy -->
                         <div onclick="startP2Task('EASY')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-green-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
                             <div>
-                                <span class="inline-block px-3 py-1 rounded-xl bg-green-100 text-green-700 border border-green-200 text-xs font-black mb-4">RETO RÁPIDO</span>
+                                <span class="inline-block px-3 py-1 rounded-xl bg-green-100 text-green-700 border border-green-200 text-xs font-black mb-4">ESFUERZO MODERADO</span>
                                 <h4 class="font-black text-xl text-slate-700">${trial.easy.count} Operaciones</h4>
-                                <p class="text-sm text-slate-500 font-medium mt-2">Cálculos cortos y sencillos.</p>
+                                <p class="text-sm text-slate-500 font-medium mt-2">Menor número de repeticiones.</p>
                             </div>
                             <div class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
                                 <span class="text-3xl font-black text-green-500">+${trial.easy.points} Pts</span>
@@ -808,12 +745,12 @@
                             </div>
                         </div>
 
-                        <!-- Hard Option -->
+                        <!-- Hard -->
                         <div onclick="startP2Task('HARD')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-yellow-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
                             <div>
-                                <span class="inline-block px-3 py-1 rounded-xl bg-yellow-100 text-yellow-700 border border-yellow-200 text-xs font-black mb-4">RETO EXIGENTE</span>
+                                <span class="inline-block px-3 py-1 rounded-xl bg-yellow-100 text-yellow-700 border border-yellow-200 text-xs font-black mb-4">ALTO ESFUERZO</span>
                                 <h4 class="font-black text-xl text-slate-700">${trial.hard.count} Operaciones</h4>
-                                <p class="text-sm text-slate-500 font-medium mt-2">Requiere más concentración y tiempo.</p>
+                                <p class="text-sm text-slate-500 font-medium mt-2">Mayor persistencia requerida.</p>
                             </div>
                             <div class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
                                 <span class="text-3xl font-black text-yellow-500">+${trial.hard.points} Pts</span>
@@ -836,6 +773,7 @@
                 points: config.points,
                 completed: 0,
                 correct: 0,
+                incorrect: 0,
                 choiceRt: rtChoice,
                 startTime: performance.now(),
                 currentMath: null
@@ -845,8 +783,8 @@
         }
 
         function generateMathProblem() {
-            const a = Math.floor(Math.random() * 12) + 2;
-            const b = Math.floor(Math.random() * 12) + 2;
+            const a = Math.floor(Math.random() * 10) + 2;
+            const b = Math.floor(Math.random() * 10) + 2;
             return { question: `${a} + ${b} = ?`, answer: a + b };
         }
 
@@ -864,8 +802,10 @@
                     completed: p2CurrentTaskState.completed,
                     totalRequired: p2CurrentTaskState.totalRequired,
                     correct: p2CurrentTaskState.correct,
+                    incorrect: p2CurrentTaskState.incorrect,
                     taskTimeMs: totalTaskTime,
                     abandoned: false,
+                    started: true,
                     pointsEarned: p2CurrentTaskState.points
                 });
 
@@ -880,7 +820,7 @@
             container.innerHTML = `
                 <div class="max-w-md w-full bg-white border-4 border-sky-200 rounded-3xl p-6 sm:p-8 shadow-xl">
                     <div class="flex justify-between items-center mb-4">
-                        <span class="text-xs font-black text-sky-500 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-xl">Progreso</span>
+                        <span class="text-xs font-black text-sky-500 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-xl">Progreso de Operaciones</span>
                         <span class="text-sm text-slate-600 font-black bg-slate-100 px-3 py-1 rounded-xl border border-slate-200">${p2CurrentTaskState.completed} / ${p2CurrentTaskState.totalRequired}</span>
                     </div>
 
@@ -889,7 +829,7 @@
                     </div>
 
                     <div class="bg-sky-50 p-6 rounded-3xl border-4 border-sky-100 text-center mb-8 shadow-inner">
-                        <span class="text-xs text-sky-600 uppercase font-black tracking-widest block mb-3">Resuelve:</span>
+                        <span class="text-xs text-sky-600 uppercase font-black tracking-widest block mb-3">Calcula:</span>
                         <div class="text-5xl font-black text-slate-800 tracking-tight">${p2CurrentTaskState.currentMath.question}</div>
                     </div>
 
@@ -898,7 +838,7 @@
                             p2CurrentTaskState.currentMath.answer,
                             p2CurrentTaskState.currentMath.answer + 2,
                             p2CurrentTaskState.currentMath.answer - 1,
-                            p2CurrentTaskState.currentMath.answer + 5
+                            p2CurrentTaskState.currentMath.answer + 4
                         ].sort(() => Math.random() - 0.5).map(ans => `
                             <button onclick="submitP2Answer(${ans})" class="btn-game py-4 bg-white hover:bg-slate-50 text-slate-700 font-black text-2xl rounded-2xl border-4 border-slate-200 active:border-slate-300 transition">
                                 ${ans}
@@ -907,7 +847,7 @@
                     </div>
 
                     <button onclick="abandonP2Task()" class="w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-bold rounded-2xl border-2 border-rose-200 transition">
-                        <i class="fa-solid fa-flag mr-1"></i> Me rindo, salir del desafío
+                        <i class="fa-solid fa-flag mr-1"></i> Abandonar Desafío
                     </button>
                 </div>
             `;
@@ -917,6 +857,8 @@
             AudioFX.playClick();
             if (ans === p2CurrentTaskState.currentMath.answer) {
                 p2CurrentTaskState.correct++;
+            } else {
+                p2CurrentTaskState.incorrect++;
             }
             p2CurrentTaskState.completed++;
             renderP2TaskScreen();
@@ -931,8 +873,10 @@
                 completed: p2CurrentTaskState.completed,
                 totalRequired: p2CurrentTaskState.totalRequired,
                 correct: p2CurrentTaskState.correct,
+                incorrect: p2CurrentTaskState.incorrect,
                 taskTimeMs: totalTaskTime,
                 abandoned: true,
+                started: true,
                 pointsEarned: 0
             });
 
@@ -941,9 +885,9 @@
         }
 
         // ==========================================
-        // FASE 3: LA APERTURA DE LOS COFRES (Respuesta a la recompensa)
+        // FASE 3: LA APERTURA DE LOS COFRES (Respuesta ante la recompensa)
+        // Measure post-win vs post-non-win RT & willingness to continue
         // ==========================================
-        // Measures post-reward vs post-non-reward task performance & reaction time.
         const phase3Trials = [
             { trialId: 1, win: true, points: 20 },
             { trialId: 2, win: false, points: 0 },
@@ -964,7 +908,7 @@
                 appState.completedPhases[2] = true;
                 appState.currentPhase = 4;
                 StorageManager.saveCurrentState();
-                showPhaseCompleteModal("¡Cofres Revisados!", "Has terminado la zona de recolección.", () => renderMap());
+                showPhaseCompleteModal("¡Cofres Revisados!", "Has finalizado el tercer territorio.", () => renderMap());
                 return;
             }
 
@@ -976,8 +920,7 @@
             container.innerHTML = `
                 <div class="max-w-md w-full bg-white border-4 ${trial.win ? 'border-yellow-300' : 'border-slate-200'} rounded-3xl p-6 sm:p-10 shadow-xl text-center">
                     <div class="flex justify-between items-center mb-6 border-b-2 border-slate-100 pb-3">
-                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-xl">Cofre Sorpresa</span>
-                        <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-xl">${p3CurrentIdx + 1} / ${phase3Trials.length}</span>
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-xl">Ensayo ${p3CurrentIdx + 1} / ${phase3Trials.length}</span>
                     </div>
 
                     <div class="w-32 h-32 rounded-full mx-auto flex items-center justify-center text-6xl mb-6 shadow-sm ${trial.win ? 'bg-yellow-100 text-yellow-500 border-4 border-yellow-300 chest-bounce' : 'bg-slate-100 text-slate-400 border-4 border-slate-200'}">
@@ -985,14 +928,14 @@
                     </div>
 
                     <h3 class="text-3xl font-black ${trial.win ? 'text-yellow-500' : 'text-slate-500'} mb-3">
-                        ${trial.win ? `¡+${trial.points} Puntos!` : 'Cofre Vacío'}
+                        ${trial.win ? `¡+${trial.points} Puntos!` : 'Sin Recompensa'}
                     </h3>
                     <p class="text-sm text-slate-600 font-medium mb-8">
-                        ${trial.win ? '¡Felicidades! Prepárate rápido para la siguiente prueba.' : 'No pasa nada. Concéntrate en la siguiente prueba.'}
+                        ${trial.win ? '¡Resultado gratificante! Continúa con la tarea de reacción.' : 'Ensayo sin premio. Continúa con la tarea de reacción.'}
                     </p>
 
                     <button onclick="renderP3PostTask()" class="btn-game w-full py-4 bg-sky-400 hover:bg-sky-300 text-sky-950 font-black text-lg border-sky-600 rounded-2xl shadow-sm transition">
-                        Continuar <i class="fa-solid fa-bolt ml-2"></i>
+                        Siguiente Actividad <i class="fa-solid fa-arrow-right ml-2"></i>
                     </button>
                 </div>
             `;
@@ -1005,11 +948,11 @@
             const container = document.getElementById('appContainer');
             container.innerHTML = `
                 <div class="max-w-md w-full bg-white border-4 border-sky-200 rounded-3xl p-6 sm:p-8 shadow-xl text-center">
-                    <span class="inline-block px-4 py-1.5 rounded-full bg-red-100 text-red-600 font-black text-xs uppercase tracking-widest mb-4 animate-pulse">¡Reacción Rápida!</span>
-                    <h3 class="text-xl font-black text-slate-800 mb-6">Toca rápidamente la figura solicitada</h3>
+                    <span class="inline-block px-4 py-1.5 rounded-full bg-sky-100 text-sky-700 font-black text-xs uppercase tracking-widest mb-4">Tarea de Reacción</span>
+                    <h3 class="text-xl font-black text-slate-800 mb-6">Toca el símbolo indicado lo antes posible</h3>
 
                     <div class="bg-sky-50 p-6 rounded-3xl border-4 border-sky-100 mb-8 shadow-inner">
-                        <span class="text-sm text-sky-600 font-bold block mb-2">Busca y toca:</span>
+                        <span class="text-xs text-sky-600 font-bold block mb-2">Objetivo:</span>
                         <span class="text-6xl text-slate-800 font-black">${targetSymbol}</span>
                     </div>
 
@@ -1034,7 +977,8 @@
                 priorWin: trial.win,
                 priorPoints: trial.points,
                 rtMs: rt,
-                correct: chosen === target
+                correct: chosen === target,
+                continued: true
             });
 
             p3CurrentIdx++;
@@ -1042,13 +986,13 @@
         }
 
         // ==========================================
-        // FASE 4: LA ÚLTIMA EXPEDICIÓN (Búsqueda de Novedad)
+        // FASE 4: LA ÚLTIMA EXPEDICIÓN (Búsqueda de Nuevas Oportunidades)
+        // Equivalent rewards (10 pts vs 10 pts) measuring novelty preference
         // ==========================================
-        // Choice between Known Activity vs Unknown/New Activity with equal points.
         const phase4Trials = [
-            { trialId: 1, known: "Refugio Conocido (Actividad Familiar)", unknown: "Ruta Desconocida (Nuevas Reglas)", points: 10 },
-            { trialId: 2, known: "Camino Habitual (Tarea Tradicional)", unknown: "Atajo Misterioso (Experiencia Nueva)", points: 10 },
-            { trialId: 3, known: "Campamento Base (Ejercicio Típico)", unknown: "Portal Mágico (Desafío Inédito)", points: 10 }
+            { trialId: 1, known: "Ruta Conocida (Familiar)", unknown: "Ruta Desconocida (Nueva)", points: 10 },
+            { trialId: 2, known: "Sendero Habitual (Tradicional)", unknown: "Atajo Misterioso (Nuevo)", points: 10 },
+            { trialId: 3, known: "Campamento Base (Familiar)", unknown: "Portal Mágico (Inédito)", points: 10 }
         ];
         let p4CurrentIdx = 0;
         let p4StartTime = 0;
@@ -1076,20 +1020,20 @@
                 <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl">
                     <div class="flex justify-between items-center mb-6 border-b-2 border-amber-100 pb-4">
                         <span class="text-xs font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-3 py-1 rounded-full border border-purple-200"><i class="fa-solid fa-compass"></i> Territorio 4</span>
-                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Ruta ${p4CurrentIdx + 1} / ${phase4Trials.length}</span>
+                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Elección ${p4CurrentIdx + 1} / ${phase4Trials.length}</span>
                     </div>
 
-                    <h3 class="text-2xl font-black text-slate-800 mb-2">Decide tu ruta final</h3>
-                    <p class="text-sm text-slate-600 font-medium mb-8">Ambos destinos esconden exactamente <span class="font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded">+${trial.points} Pts</span>.</p>
+                    <h3 class="text-2xl font-black text-slate-800 mb-2">Selecciona tu ruta final</h3>
+                    <p class="text-sm text-slate-600 font-medium mb-8">Ambas opciones otorgan una recompensa equivalente de <span class="font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded">+${trial.points} Pts</span>.</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
-                        <!-- Known Territory -->
+                        <!-- Known -->
                         <div onclick="selectP4Option('KNOWN')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-sky-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
                             <div>
                                 <div class="w-16 h-16 rounded-2xl bg-sky-100 text-sky-500 border-2 border-sky-200 flex items-center justify-center text-3xl mb-4">
                                     <i class="fa-solid fa-house"></i>
                                 </div>
-                                <span class="text-xs font-black text-sky-500 block mb-2 tracking-widest uppercase">Camino Familiar</span>
+                                <span class="text-xs font-black text-sky-500 block mb-2 tracking-widest uppercase">Opción Conocida</span>
                                 <h4 class="font-black text-xl text-slate-700">${trial.known}</h4>
                             </div>
                             <div class="mt-8 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
@@ -1098,13 +1042,13 @@
                             </div>
                         </div>
 
-                        <!-- Unknown Territory -->
+                        <!-- Unknown -->
                         <div onclick="selectP4Option('UNKNOWN')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-purple-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
                             <div>
                                 <div class="w-16 h-16 rounded-2xl bg-purple-100 text-purple-500 border-2 border-purple-200 flex items-center justify-center text-3xl mb-4">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                                 </div>
-                                <span class="text-xs font-black text-purple-500 block mb-2 tracking-widest uppercase">Camino Nuevo</span>
+                                <span class="text-xs font-black text-purple-500 block mb-2 tracking-widest uppercase">Opción Novedosa</span>
                                 <h4 class="font-black text-xl text-slate-700">${trial.unknown}</h4>
                             </div>
                             <div class="mt-8 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
@@ -1159,43 +1103,47 @@
         }
 
         // ==========================================
-        // SCORING ALGORITHM (4 Descriptive Indicators 0-100)
+        // ALGORITMO DE PUNTUACIONES CONDUCTUALES (0-100)
+        // Basado estrictamente en conductas registradas
         // ==========================================
         function calculateIndicators(state) {
-            // 1. Aproximación a la recompensa (Magnitude/Risk drive in Phase 1)
+            // 1. Aproximación a la Recompeensa (Proporción de elecciones de alta magnitud B)
             let p1Score = 50;
-            if (state.responses.phase1.length > 0) {
+            if (state.responses.phase1 && state.responses.phase1.length > 0) {
                 const highMagChoices = state.responses.phase1.filter(r => r.chosenOption === 'B').length;
                 p1Score = Math.round((highMagChoices / state.responses.phase1.length) * 100);
             }
 
-            // 2. Motivación y Persistencia (Hard task selection & completions in Phase 2)
+            // 2. Motivación y Persistencia (Elección de esfuerzo + tasa de finalización)
             let p2Score = 50;
-            if (state.responses.phase2.length > 0) {
+            if (state.responses.phase2 && state.responses.phase2.length > 0) {
                 const hardChoices = state.responses.phase2.filter(r => r.choiceType === 'HARD').length;
-                const nonAbandoned = state.responses.phase2.filter(r => !r.abandoned).length;
-                const choiceRatio = hardChoices / state.responses.phase2.length;
-                const completionRatio = nonAbandoned / state.responses.phase2.length;
-                p2Score = Math.round((choiceRatio * 0.6 + completionRatio * 0.4) * 100);
-            }
-
-            // 3. Respuesta ante la Recompensa (Speed increase post win vs post non-win in Phase 3)
-            let p3Score = 50;
-            if (state.responses.phase3.length > 0) {
-                const postWinRTs = state.responses.phase3.filter(r => r.priorWin).map(r => r.rtMs);
-                const postLossRTs = state.responses.phase3.filter(r => !r.priorWin).map(r => r.rtMs);
+                const completedTasks = state.responses.phase2.filter(r => !r.abandoned && r.started).length;
                 
-                const avgWin = postWinRTs.length ? (postWinRTs.reduce((a,b)=>a+b,0)/postWinRTs.length) : 1000;
-                const avgLoss = postLossRTs.length ? (postLossRTs.reduce((a,b)=>a+b,0)/postLossRTs.length) : 1000;
-
-                // Faster response post-win relative to loss indicates higher post-reward activation
-                const diff = avgLoss - avgWin; // Positive means faster after win
-                p3Score = Math.min(100, Math.max(0, Math.round(50 + (diff / 20))));
+                const effortRatio = hardChoices / state.responses.phase2.length;
+                const completionRatio = completedTasks / state.responses.phase2.length;
+                p2Score = Math.round((effortRatio * 0.5 + completionRatio * 0.5) * 100);
             }
 
-            // 4. Búsqueda de Nuevas Oportunidades (Novelty choices in Phase 4)
+            // 3. Respuesta ante la Recompensa (Diferencial de TR tras premio vs sin premio)
+            let p3Score = 50;
+            if (state.responses.phase3 && state.responses.phase3.length > 0) {
+                const winRTs = state.responses.phase3.filter(r => r.priorWin).map(r => r.rtMs);
+                const lossRTs = state.responses.phase3.filter(r => !r.priorWin).map(r => r.rtMs);
+
+                if (winRTs.length > 0 && lossRTs.length > 0) {
+                    const avgWin = winRTs.reduce((a,b) => a+b, 0) / winRTs.length;
+                    const avgLoss = lossRTs.reduce((a,b) => a+b, 0) / lossRTs.length;
+                    
+                    // Si el TR posterior al premio es menor (más rápido), refleja activación
+                    const diffMs = avgLoss - avgWin;
+                    p3Score = Math.min(100, Math.max(0, Math.round(50 + (diffMs / 15))));
+                }
+            }
+
+            // 4. Búsqueda de Nuevas Oportunidades (Proporción de opciones novedosas)
             let p4Score = 50;
-            if (state.responses.phase4.length > 0) {
+            if (state.responses.phase4 && state.responses.phase4.length > 0) {
                 const unknownChoices = state.responses.phase4.filter(r => r.choice === 'UNKNOWN').length;
                 p4Score = Math.round((unknownChoices / state.responses.phase4.length) * 100);
             }
@@ -1209,7 +1157,7 @@
         }
 
         // ==========================================
-        // VIEW 5: FINAL RESULTS SCREEN
+        // VIEW 5: PANTALLA FINAL DE RESULTADOS
         // ==========================================
         function renderFinalResults() {
             const scores = calculateIndicators(appState);
@@ -1217,112 +1165,106 @@
 
             container.innerHTML = `
                 <div class="max-w-4xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
-                    <!-- Title -->
                     <div class="text-center">
                         <span class="inline-block px-5 py-2 rounded-full bg-yellow-100 text-yellow-600 font-black text-sm uppercase tracking-widest border-2 border-yellow-300 mb-4">
-                            ¡Aventura Completada!
+                            ¡ENHORABUENA! HAS COMPLETADO REWARD ISLAND
                         </span>
-                        <h2 class="text-3xl sm:text-5xl font-black text-sky-500 mb-3" style="text-shadow: 2px 2px 0px #bae6fd;">MOCHILA DE EXPLORADOR</h2>
-                        <p class="text-sm font-medium text-slate-500 max-w-xl mx-auto mt-2">
-                            Has superado todos los desafíos de la isla. Aquí tienes el resumen de tu estilo de juego basado en las decisiones que tomaste.
-                        </p>
+                        <h2 class="text-3xl sm:text-5xl font-black text-sky-500 mb-3" style="text-shadow: 2px 2px 0px #bae6fd;">PERFIL DE RESULTADOS</h2>
                     </div>
 
-                    <!-- Total Score Display -->
                     <div class="bg-yellow-50 p-6 rounded-3xl border-4 border-yellow-200 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-inner">
                         <div class="flex items-center gap-5">
                             <div class="w-20 h-20 rounded-3xl bg-yellow-400 text-yellow-900 flex items-center justify-center text-4xl border-4 border-yellow-500 shadow-sm">
                                 <i class="fa-solid fa-crown"></i>
                             </div>
                             <div>
-                                <span class="text-sm text-yellow-700 block font-black uppercase tracking-widest mb-1">Puntuación Total</span>
+                                <span class="text-sm text-yellow-700 block font-black uppercase tracking-widest mb-1">Puntos Acumulados</span>
                                 <span class="text-5xl font-black text-yellow-500" style="text-shadow: 1px 1px 0px #ca8a04;">${appState.points} pts</span>
                             </div>
                         </div>
                         <div class="text-xs text-sky-700 font-bold bg-sky-100 px-4 py-2 rounded-xl border-2 border-sky-200">
-                            Jugador ID: <span class="text-sky-600 font-black text-base ml-1">${appState.participantId}</span>
+                            ID Participante: <span class="text-sky-600 font-black text-base ml-1">${appState.participantId}</span>
                         </div>
                     </div>
 
-                    <!-- 4 Charts Grid -->
+                    <!-- 4 Indicators Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Scale 1 -->
+                        <!-- Indicator 1 -->
                         <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
                             <div>
                                 <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">1. Atracción por el Riesgo</h4>
-                                    <span class="text-2xl font-black text-yellow-500 bg-yellow-50 px-3 py-1 rounded-xl">${scores.anticipation}</span>
+                                    <h4 class="font-black text-slate-700 text-base">Aproximación a la recompensa</h4>
+                                    <span class="text-2xl font-black text-yellow-500 bg-yellow-50 px-3 py-1 rounded-xl">${scores.anticipation} / 100</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
                                     <div class="bg-yellow-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.anticipation}%"></div>
                                 </div>
                                 <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Tu tendencia a ir a por el tesoro más grande aunque sea más difícil de conseguir.
+                                    Refleja las preferencias observadas ante alternativas con diferentes magnitudes y probabilidades de recompensa.
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Scale 2 -->
+                        <!-- Indicator 2 -->
                         <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
                             <div>
                                 <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">2. Motivación y Esfuerzo</h4>
-                                    <span class="text-2xl font-black text-green-500 bg-green-50 px-3 py-1 rounded-xl">${scores.persistence}</span>
+                                    <h4 class="font-black text-slate-700 text-base">Motivación y persistencia</h4>
+                                    <span class="text-2xl font-black text-green-500 bg-green-50 px-3 py-1 rounded-xl">${scores.persistence} / 100</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
                                     <div class="bg-green-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.persistence}%"></div>
                                 </div>
                                 <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Cómo de dispuesto estás a realizar tareas más largas y difíciles para ganar más puntos.
+                                    Refleja la disposición a invertir esfuerzo y mantener la participación en tareas asociadas a recompensas.
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Scale 3 -->
+                        <!-- Indicator 3 -->
                         <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
                             <div>
                                 <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">3. Alegría de Victoria</h4>
-                                    <span class="text-2xl font-black text-sky-500 bg-sky-50 px-3 py-1 rounded-xl">${scores.responsiveness}</span>
+                                    <h4 class="font-black text-slate-700 text-base">Respuesta ante la recompensa</h4>
+                                    <span class="text-2xl font-black text-sky-500 bg-sky-50 px-3 py-1 rounded-xl">${scores.responsiveness} / 100</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
                                     <div class="bg-sky-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.responsiveness}%"></div>
                                 </div>
                                 <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Refleja si te vuelves más rápido y activo justo después de haber ganado un premio.
+                                    Refleja los cambios conductuales observados después de obtener resultados gratificantes.
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Scale 4 -->
+                        <!-- Indicator 4 -->
                         <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
                             <div>
                                 <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">4. Curiosidad Exploradora</h4>
-                                    <span class="text-2xl font-black text-purple-500 bg-purple-50 px-3 py-1 rounded-xl">${scores.novelty}</span>
+                                    <h4 class="font-black text-slate-700 text-base">Búsqueda de nuevas oportunidades</h4>
+                                    <span class="text-2xl font-black text-purple-500 bg-purple-50 px-3 py-1 rounded-xl">${scores.novelty} / 100</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
                                     <div class="bg-purple-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.novelty}%"></div>
                                 </div>
                                 <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Tu preferencia por probar caminos y zonas nuevas en lugar de repetir lo ya conocido.
+                                    Refleja la preferencia por explorar alternativas novedosas frente a opciones conocidas. Es un indicador complementario.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Notice Disclaimer -->
-                    <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200 text-xs text-slate-500 font-medium leading-relaxed flex items-start gap-3">
-                        <i class="fa-solid fa-circle-info text-base text-sky-400 mt-0.5"></i>
+                    <!-- Mandatory Disclaimer -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border-2 border-slate-200 text-xs text-slate-600 font-medium leading-relaxed flex items-start gap-3">
+                        <i class="fa-solid fa-circle-info text-lg text-sky-500 mt-0.5"></i>
                         <div>
-                            <strong>Nota:</strong> Estos resultados son parte de un juego educativo experimental. Los números son un resumen de las partidas, no un análisis médico o clínico real.
+                            Las puntuaciones representan indicadores conductuales experimentales en una escala descriptiva de 0 a 100. No son percentiles, puntuaciones normativas ni resultados de una prueba psicométrica validada. Deben interpretarse de forma exploratoria y no tienen finalidad diagnóstica.
                         </div>
                     </div>
 
-                    <!-- Action buttons -->
                     <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4 border-t-2 border-amber-100">
                         <button onclick="window.print()" class="btn-game px-6 py-4 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-black border-slate-400 rounded-2xl transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-print"></i> Guardar Recuerdo (PDF)
+                            <i class="fa-solid fa-print"></i> Imprimir o Guardar Informe (PDF)
                         </button>
                     </div>
                 </div>
@@ -1330,7 +1272,7 @@
         }
 
         // ==========================================
-        // EVALUATOR / ADMIN PANEL
+        // PANEL DEL EVALUADOR
         // ==========================================
         function openAdminModal() {
             AudioFX.playClick();
@@ -1345,8 +1287,8 @@
                             <i class="fa-solid fa-user-lock"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-black text-slate-800">Panel del Profesor</h3>
-                            <p class="text-sm font-medium text-slate-500">Clave de acceso: 'admin'</p>
+                            <h3 class="text-xl font-black text-slate-800">Panel del Evaluador</h3>
+                            <p class="text-sm font-medium text-slate-500">Contraseña predeterminada: 'admin'</p>
                         </div>
                     </div>
 
@@ -1362,47 +1304,13 @@
             `;
         }
 
-        // ==========================================
-        // EVALUATOR / ADMIN PANEL
-        // ==========================================
-        function openAdminModal() {
-            AudioFX.playClick();
-            const modal = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
-            modal.classList.remove('hidden');
-
-            content.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg border border-amber-500/30">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-100">Acceso al Panel del Evaluador</h3>
-                            <p class="text-xs text-slate-400">Introduce la contraseña de acceso (Predeterminada: 'admin')</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1 font-semibold">Contraseña</label>
-                        <input type="password" id="adminPassInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-slate-100 focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-3">
-                        <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs rounded-xl transition">Cancelar</button>
-                        <button onclick="verifyAdminPass()" class="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition">Acceder</button>
-                    </div>
-                </div>
-            `;
-        }
-
         function verifyAdminPass() {
             const val = document.getElementById('adminPassInput').value;
             if (val === ADMIN_PASSWORD) {
                 closeModal();
                 renderAdminDashboard();
             } else {
-                alert("Contraseña incorrecta. Inténtalo de nuevo.");
+                alert("Contraseña incorrecta.");
             }
         }
 
@@ -1412,63 +1320,60 @@
 
             container.innerHTML = `
                 <div class="max-w-5xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-                    <!-- Admin Header -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-slate-100 pb-6 gap-4">
                         <div>
                             <span class="text-xs font-black text-sky-500 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-xl">Zona Privada</span>
-                            <h2 class="text-3xl font-black text-slate-800 mt-2">Registros del Investigador</h2>
+                            <h2 class="text-3xl font-black text-slate-800 mt-2">Panel de Administración de Datos</h2>
                         </div>
                         <div class="flex items-center gap-3">
                             <button onclick="exportAllCSV()" class="btn-game px-4 py-3 bg-green-400 hover:bg-green-300 text-green-950 text-sm font-black border-green-600 rounded-xl transition flex items-center gap-2">
-                                <i class="fa-solid fa-file-csv"></i> Descargar Datos CSV
+                                <i class="fa-solid fa-file-csv"></i> Descargar Datos (CSV)
                             </button>
                             <button onclick="renderMap()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-bold rounded-xl border-2 border-slate-200 transition">
-                                <i class="fa-solid fa-xmark"></i> Cerrar
+                                <i class="fa-solid fa-xmark"></i> Salir
                             </button>
                         </div>
                     </div>
 
-                    <!-- Aggregate Metrics -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                            <span class="text-xs text-slate-500 block font-bold uppercase">Jugadores</span>
+                            <span class="text-xs text-slate-500 block font-bold uppercase">Sesiones Registradas</span>
                             <span class="text-3xl font-black text-slate-700">${allSessions.length}</span>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                            <span class="text-xs text-slate-500 block font-bold uppercase">Terminaron</span>
+                            <span class="text-xs text-slate-500 block font-bold uppercase">Completadas</span>
                             <span class="text-3xl font-black text-green-500">${allSessions.filter(s => s.completedPhases.every(Boolean)).length}</span>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                            <span class="text-xs text-slate-500 block font-bold uppercase">Media Puntos</span>
+                            <span class="text-xs text-slate-500 block font-bold uppercase">Puntos Medios</span>
                             <span class="text-3xl font-black text-yellow-500">${allSessions.length ? Math.round(allSessions.reduce((a,b)=>a+(b.points||0),0)/allSessions.length) : 0}</span>
                         </div>
                         <div class="bg-sky-50 p-4 rounded-2xl border-2 border-sky-200">
-                            <span class="text-xs text-sky-600 block font-bold uppercase">ID Actual</span>
+                            <span class="text-xs text-sky-600 block font-bold uppercase">Sesión Actual</span>
                             <span class="text-sm font-black text-sky-700 truncate block mt-1">${appState.participantId}</span>
                         </div>
                     </div>
 
-                    <!-- Sessions Log Table -->
                     <div class="bg-white rounded-2xl border-4 border-slate-100 overflow-hidden shadow-sm">
                         <div class="p-4 bg-slate-50 border-b-2 border-slate-200 flex justify-between items-center">
-                            <h4 class="font-black text-slate-700 text-sm uppercase">Lista de Partidas Guardadas</h4>
-                            <button onclick="clearSystemData()" class="text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100">Borrar Todo</button>
+                            <h4 class="font-black text-slate-700 text-sm uppercase">Registros Individuales</h4>
+                            <button onclick="clearSystemData()" class="text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100">Borrar Base de Datos</button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-white text-slate-400 border-b-2 border-slate-100 uppercase font-black text-xs">
                                     <tr>
-                                        <th class="p-4">Jugador</th>
-                                        <th class="p-4">Hora</th>
-                                        <th class="p-4">Zonas</th>
+                                        <th class="p-4">ID Anónimo</th>
+                                        <th class="p-4">Fecha/Hora</th>
+                                        <th class="p-4">Fases</th>
                                         <th class="p-4">Puntos</th>
-                                        <th class="p-4">Resultados (1|2|3|4)</th>
-                                        <th class="p-4 text-right">Ver</th>
+                                        <th class="p-4">Indicadores (1|2|3|4)</th>
+                                        <th class="p-4 text-right">Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y-2 divide-slate-50 text-slate-600 font-medium">
                                     ${allSessions.length === 0 ? `
-                                        <tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">Nadie ha jugado todavía en este dispositivo.</td></tr>
+                                        <tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">No existen registros en el sistema.</td></tr>
                                     ` : allSessions.map(s => {
                                         const ind = calculateIndicators(s);
                                         return `
@@ -1480,7 +1385,7 @@
                                                 <td class="p-4 font-black text-slate-400 bg-slate-50 rounded-lg">${ind.anticipation} | ${ind.persistence} | ${ind.responsiveness} | ${ind.novelty}</td>
                                                 <td class="p-4 text-right">
                                                     <button onclick="inspectSession('${s.participantId}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold border border-slate-300">
-                                                        Detalles
+                                                        Ver Logs
                                                     </button>
                                                 </td>
                                             </tr>
@@ -1506,79 +1411,34 @@
             content.innerHTML = `
                 <div class="space-y-4 max-h-[80vh] overflow-y-auto p-2">
                     <div class="flex justify-between items-center border-b-2 border-slate-100 pb-3">
-                        <h3 class="text-xl font-black text-sky-600">Datos: ${session.participantId}</h3>
+                        <h3 class="text-xl font-black text-sky-600">Registro: ${session.participantId}</h3>
                         <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 bg-slate-100 p-2 rounded-full"><i class="fa-solid fa-xmark"></i></button>
                     </div>
 
                     <div class="text-sm text-slate-600 font-medium space-y-2 bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
                         <p><strong class="text-slate-700">Inicio:</strong> ${session.startTime}</p>
                         <p><strong class="text-slate-700">Fin:</strong> ${session.endTime || 'En curso'}</p>
-                        <p><strong class="text-slate-700">Botín Final:</strong> <span class="text-yellow-600 font-black">${session.points}</span></p>
+                        <p><strong class="text-slate-700">Puntos Totales:</strong> <span class="text-yellow-600 font-black">${session.points}</span></p>
                     </div>
 
                     <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">1. Decisiones (Territorio 1):</span>
+                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 1 (Aproximación):</span>
                         <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase1, null, 2)}</pre>
                     </div>
 
                     <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">2. Desafíos (Territorio 2):</span>
+                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 2 (Motivación y Esfuerzo):</span>
                         <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase2, null, 2)}</pre>
                     </div>
 
                     <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">3. Velocidad (Territorio 3):</span>
+                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 3 (Respuesta ante Recompensa):</span>
                         <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase3, null, 2)}</pre>
                     </div>
 
                     <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">4. Rutas (Territorio 4):</span>
+                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 4 (Búsqueda Novedad):</span>
                         <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase4, null, 2)}</pre>
-                    </div>
-                </div>
-            `;
-        }
-
-        function inspectSession(partId) {
-            const all = StorageManager.getAllSessions();
-            const session = all.find(s => s.participantId === partId);
-            if (!session) return;
-
-            const modal = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
-            modal.classList.remove('hidden');
-
-            content.innerHTML = `
-                <div class="space-y-4 max-h-[80vh] overflow-y-auto">
-                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                        <h3 class="text-lg font-bold text-amber-400 font-mono">Sesión: ${session.participantId}</h3>
-                        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-
-                    <div class="text-xs text-slate-300 space-y-2 font-mono">
-                        <p><strong>Inicio:</strong> ${session.startTime}</p>
-                        <p><strong>Fin:</strong> ${session.endTime || 'En curso'}</p>
-                        <p><strong>Puntos acumulados:</strong> ${session.points}</p>
-                    </div>
-
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono">
-                        <span class="text-emerald-400 font-bold block mb-1">Registros de Fase 1 (Anticipación):</span>
-                        <pre class="text-slate-400 text-[10px] overflow-x-auto">${JSON.stringify(session.responses.phase1, null, 2)}</pre>
-                    </div>
-
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono">
-                        <span class="text-emerald-400 font-bold block mb-1">Registros de Fase 2 (Esfuerzo):</span>
-                        <pre class="text-slate-400 text-[10px] overflow-x-auto">${JSON.stringify(session.responses.phase2, null, 2)}</pre>
-                    </div>
-
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono">
-                        <span class="text-emerald-400 font-bold block mb-1">Registros de Fase 3 (Respuesta):</span>
-                        <pre class="text-slate-400 text-[10px] overflow-x-auto">${JSON.stringify(session.responses.phase3, null, 2)}</pre>
-                    </div>
-
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono">
-                        <span class="text-emerald-400 font-bold block mb-1">Registros de Fase 4 (Novedad):</span>
-                        <pre class="text-slate-400 text-[10px] overflow-x-auto">${JSON.stringify(session.responses.phase4, null, 2)}</pre>
                     </div>
                 </div>
             `;
@@ -1587,11 +1447,11 @@
         function exportAllCSV() {
             const sessions = StorageManager.getAllSessions();
             if(!sessions.length) {
-                alert("No hay datos para exportar.");
+                alert("No existen datos registados para exportar.");
                 return;
             }
 
-            let csv = "ParticipantID,StartTime,EndTime,Points,P1_Anticipation_Score,P2_Persistence_Score,P3_Responsiveness_Score,P4_Novelty_Score\n";
+            let csv = "ParticipantID,StartTime,EndTime,Points,P1_Anticipation,P2_Persistence,P3_Responsiveness,P4_Novelty\n";
             sessions.forEach(s => {
                 const ind = calculateIndicators(s);
                 csv += `"${s.participantId}","${s.startTime}","${s.endTime || ''}",${s.points},${ind.anticipation},${ind.persistence},${ind.responsiveness},${ind.novelty}\n`;
@@ -1606,7 +1466,7 @@
         }
 
         function clearSystemData() {
-            if (confirm("¿Estás seguro de que deseas eliminar permanentemente todos los datos guardados en el navegador?")) {
+            if (confirm("¿Confirmas que deseas borrar permanentemente todos los registros del navegador?")) {
                 StorageManager.clearAllData();
                 renderAdminDashboard();
             }
