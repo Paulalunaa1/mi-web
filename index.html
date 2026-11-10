@@ -2,1474 +2,275 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>REWARD ISLAND - Evaluación Conductual Interactive</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Lab - Diseñador de Sesión</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        emerald: { 850: '#064e3b', 950: '#022c22' },
-                        amber: { 450: '#f59e0b', 550: '#d97706' },
-                        cyan: { 950: '#083344' }
-                    },
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        display: ['Georgia', 'serif']
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#e74c3c',       /* Rojo suave para títulos */
+                            pinkBg: '#fef2f2',    /* Fondo rosa muy claro */
+                            purple: '#6366f1',    /* Morado para subtítulos */
+                            purpleBg: '#f5f3ff',  /* Fondo morado muy claro */
+                        }
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        html, body {
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-            width: 100%;
-            height: 100%;
-        }
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            user-select: none;
-            -webkit-user-select: none;
-            background-color: #fff9e6; /* Fondo beis cálido */
+            background-color: #f8fafc;
+            color: #334155;
         }
-        .island-bg {
-            background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 50%, #0ea5e9 100%);
-        }
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(254, 243, 199, 0.6);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #fcd34d;
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1; 
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #fbbf24;
+        textarea::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
         }
-        @keyframes pulse-subtle {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.03); opacity: 0.9; }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
         }
-        .animate-pulse-subtle {
-            animation: pulse-subtle 3s infinite ease-in-out;
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .chest-bounce {
-            animation: bounce 0.6s cubic-bezier(0.36, 0, 0.66, -0.56) alternate infinite;
-        }
-        /* Botones estilo videojuego */
-        .btn-game {
-            border-bottom-width: 4px;
-            transition: all 0.1s;
-        }
-        .btn-game:active {
-            border-bottom-width: 0px;
-            transform: translateY(4px);
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col justify-between overflow-x-hidden antialiased">
+<body class="antialiased min-h-screen p-4 md:p-8">
 
-    <!-- TOP NAV / BAR -->
-    <header class="w-full bg-white/90 border-b-4 border-amber-200 backdrop-blur-md px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-sm">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-yellow-400 border-2 border-yellow-500 flex items-center justify-center text-yellow-900 font-black text-xl shadow-sm">
-                <i class="fa-solid fa-compass"></i>
-            </div>
-            <div>
-                <h1 class="font-black text-xl tracking-wide text-sky-600 leading-none">REWARD ISLAND</h1>
-                <span class="text-xs text-slate-500 font-bold">Aventura Conductual</span>
-            </div>
-        </div>
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <header class="mb-8 text-center md:text-left border-b border-gray-200 pb-4">
+            <h1 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Tema 5</h1>
+            <h2 class="text-3xl font-bold text-brand-red">WRITING LAB</h2>
+        </header>
 
-        <div id="navControls" class="flex items-center space-x-2">
-            <!-- Progress / Score indicator -->
-            <div id="scoreBadge" class="hidden flex items-center bg-yellow-100 border-2 border-yellow-300 rounded-full px-3 py-1 text-sm font-black text-yellow-700 shadow-sm">
-                <i class="fa-solid fa-coins text-yellow-500 mr-2"></i>
-                <span id="currentPoints">0</span> <span class="ml-1 text-xs text-yellow-600">pts</span>
-            </div>
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Column: Guía de la Sesión (1/3 width on desktop) -->
+            <aside class="lg:col-span-4 space-y-6">
+                
+                <!-- Section 1: Reglas -->
+                <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-brand-red mb-4">1. Cómo funciona la sesión</h3>
+                        
+                        <div class="bg-brand-pinkBg border-l-4 border-red-300 p-4 mb-5 rounded-r-lg text-sm text-red-900">
+                            <strong class="block text-brand-red mb-1">NO ES UNA PRESENTACIÓN</strong>
+                            Vuestro objetivo no es explicar diapositivas. Debéis conseguir que vuestros compañeros lo practiquen y se lleven una idea clara.
+                        </div>
 
-            <!-- Participant ID chip -->
-            <div id="participantBadge" class="hidden md:flex items-center bg-sky-50 border-2 border-sky-200 rounded-full px-3 py-1 text-xs text-sky-700 font-bold">
-                <i class="fa-solid fa-user-shield text-sky-500 mr-1.5"></i>
-                <span id="displayPartId">ID: Anonymous</span>
-            </div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Requisitos de vuestra experiencia</h4>
+                        <ul class="space-y-2 text-sm text-gray-600 list-disc pl-5">
+                            <li><span class="font-medium">Máximo 5 minutos.</span></li>
+                            <li>La explicación teórica debe ser muy breve.</li>
+                            <li><span class="font-medium text-brand-red">Los compañeros deben participar activamente.</span></li>
+                            <li>Deben pensar, decidir, crear, comparar, reescribir o resolver algo.</li>
+                            <li>La actividad debe terminar con una idea clave o takeaway.</li>
+                        </ul>
+                    </div>
+                </section>
 
-            <!-- Admin access button -->
-            <button onclick="openAdminModal()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold border-2 border-slate-300 rounded-xl transition flex items-center gap-1.5">
-                <i class="fa-solid fa-lock text-slate-400"></i>
-                <span class="hidden sm:inline">Panel</span>
-            </button>
-        </div>
-    </header>
+                <!-- Section 2: Marco Común -->
+                <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-brand-red mb-4">2. Marco común</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Antes de escribir -->
+                            <div class="bg-brand-purpleBg p-4 rounded-lg">
+                                <h4 class="font-bold text-brand-purple text-sm mb-1 uppercase">Antes de escribir</h4>
+                                <p class="text-xs font-medium text-gray-700 tracking-wide">
+                                    PROPÓSITO + AUDIENCIA &rarr; CONTENIDO &middot; ESTRUCTURA &middot; ESTILO
+                                </p>
+                            </div>
+                            <p class="text-xs text-gray-500 italic">Escribir bien empieza antes de escribir: primero decides para quién escribes y qué quieres conseguir; después eliges qué decir, cómo organizarlo y cómo expresarlo.</p>
+                            
+                            <!-- Proceso de escritura -->
+                            <div class="bg-brand-purpleBg p-4 rounded-lg">
+                                <h4 class="font-bold text-brand-purple text-sm mb-1 uppercase">Proceso de escritura</h4>
+                                <p class="text-xs font-medium text-gray-700 tracking-wide">
+                                    PLAN &rarr; DRAFT &rarr; REVISE &rarr; PROOFREAD
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
 
-    <!-- MAIN CONTAINER -->
-    <main id="appContainer" class="flex-grow flex items-center justify-center p-3 sm:p-6 max-w-6xl w-full mx-auto">
-        <!-- Dynamic views will be rendered here -->
-    </main>
+            <!-- Right Column: Diseñador de Experiencia (2/3 width on desktop) -->
+            <section class="lg:col-span-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
+                
+                <div class="mb-2">
+                    <span class="text-xs font-bold text-brand-red uppercase tracking-widest">Categoría 2</span>
+                </div>
+                <h2 class="text-3xl font-bold text-brand-red mb-2">Contenido + relevancia</h2>
+                <h3 class="text-lg font-medium text-brand-purple mb-6">Elegir qué información merece estar en el texto.</h3>
+                
+                <!-- Objetivo Alert -->
+                <div class="bg-brand-purpleBg border-l-4 border-indigo-300 p-4 mb-8 rounded-r-lg">
+                    <strong class="block text-brand-purple text-sm uppercase mb-1">Objetivo</strong>
+                    <p class="text-sm text-gray-700">Ser capaces de seleccionar información relevante y eliminar contenido innecesario.</p>
+                </div>
 
-    <!-- FOOTER -->
-    <footer class="w-full bg-white border-t-4 border-amber-200 py-4 px-4 text-center text-xs text-slate-500 font-medium">
-        <p>REWARD ISLAND &copy; 2026 — Herramienta Experimental Educativa de Evaluación Conductual.</p>
-        <p class="mt-1 text-slate-400">No constituye un diagnóstico clínico ni una prueba psicométrica normatizada.</p>
-    </footer>
+                <!-- Recordatorio Desplegable -->
+                <details class="mb-8 group border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                    <summary class="font-semibold text-gray-700 p-4 cursor-pointer hover:bg-gray-100 transition-colors list-none flex justify-between items-center">
+                        <span>💡 Preguntas clave que debéis poder responder</span>
+                        <span class="transition group-open:rotate-180">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="p-4 pt-0 text-sm text-gray-600 bg-gray-50 border-t border-gray-200">
+                        <ul class="list-disc pl-5 mt-3 space-y-2">
+                            <li>¿Qué necesita saber <strong>realmente</strong> el lector?</li>
+                            <li>¿Qué información es <strong>esencial</strong>?</li>
+                            <li>¿Qué información distrae o sobrecarga?</li>
+                            <li>¿Hay datos correctos pero irrelevantes?</li>
+                            <li>¿Podría eliminar algo sin perder el mensaje?</li>
+                        </ul>
+                    </div>
+                </details>
 
-    <!-- MODAL CONTAINER -->
-    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div id="modalContent" class="bg-white border-4 border-amber-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative">
-            <!-- Dynamic Modal Contents -->
-        </div>
+                <!-- Formulario -->
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Diseño de vuestra experiencia</h3>
+                <p class="text-sm text-gray-500 mb-6">Completad los siguientes apartados para estructurar vuestra dinámica de 5 minutos.</p>
+                
+                <form id="planForm" class="space-y-6">
+                    
+                    <div class="flex flex-col">
+                        <label for="q1" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
+                            ¿Qué queréis que aprendan en 5 minutos?
+                        </label>
+                        <textarea id="q1" rows="3" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Que más información no significa mejor comunicación..."></textarea>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="q2" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
+                            ¿Qué tendrán que <span class="uppercase text-brand-red">HACER</span> para practicarlo?
+                        </label>
+                        <textarea id="q2" rows="3" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Leer un correo electrónico largo y tachar las frases irrelevantes..."></textarea>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="q3" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
+                            ¿Cómo comprobaréis que lo han entendido?
+                        </label>
+                        <textarea id="q3" rows="3" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Pediremos a dos parejas que compartan qué eliminaron y por qué..."></textarea>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="q4" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
+                            Takeaway: una idea que deben recordar
+                        </label>
+                        <textarea id="q4" rows="2" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Ante la duda, si no ayuda a decidir o entender, bórralo."></textarea>
+                    </div>
+
+                    <div class="pt-4 text-right">
+                        <button type="button" onclick="generarPlan()" class="bg-brand-red hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 w-full sm:w-auto">
+                            Generar Plan de Sesión
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Output Area (Hidden by default) -->
+                <div id="resumenContainer" class="hidden mt-10 pt-8 border-t-2 border-dashed border-gray-200">
+                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 print:shadow-none print:border-none">
+                        
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-2xl font-bold text-gray-800">Plan de Sesión: Contenido + Relevancia</h3>
+                            <button onclick="window.print()" class="text-gray-500 hover:text-brand-purple p-2 rounded-full hover:bg-brand-purpleBg transition-colors" title="Imprimir o guardar como PDF">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-purple mb-1">Objetivo de aprendizaje (5 min)</h4>
+                                <p id="out-q1" class="text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-brand-purple"></p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-red mb-1">Actividad práctica</h4>
+                                <p id="out-q2" class="text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-brand-red"></p>
+                            </div>
+
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-500 mb-1">Comprobación del aprendizaje</h4>
+                                <p id="out-q3" class="text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-indigo-400"></p>
+                            </div>
+
+                            <div class="bg-brand-pinkBg p-5 rounded-lg text-center mt-6">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-red mb-2">⭐ Takeaway Principal</h4>
+                                <p id="out-q4" class="text-lg font-medium text-gray-800 italic"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
     </div>
 
-    <!-- MAIN APPLICATION LOGIC SCRIPT -->
     <script>
-        const ADMIN_PASSWORD = "admin";
-        
-        let appState = {
-            participantId: null,
-            startTime: null,
-            endTime: null,
-            currentPhase: 0,
-            points: 0,
-            completedPhases: [false, false, false, false],
-            responses: {
-                phase1: [], // Anticipation & Expected Value Choices
-                phase2: [], // Drive, Effort & Persistence
-                phase3: [], // Post-Reward Behavioral Responsiveness
-                phase4: []  // Exploration & Novelty Seeking
-            }
-        };
-
-        // Web Audio Synth Engine
-        const AudioFX = {
-            ctx: null,
-            init() {
-                if (!this.ctx) {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioCtx();
-                }
-                if (this.ctx && this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            },
-            playCoin() {
-                try {
-                    this.init();
-                    const now = this.ctx.currentTime;
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(987.77, now);
-                    osc.frequency.setValueAtTime(1318.51, now + 0.08);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
-                } catch(e) {}
-            },
-            playSuccess() {
-                try {
-                    this.init();
-                    const now = this.ctx.currentTime;
-                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-                        const osc = this.ctx.createOscillator();
-                        const gain = this.ctx.createGain();
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
-                        gain.gain.setValueAtTime(0.15, now + idx * 0.08);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
-                        osc.connect(gain);
-                        gain.connect(this.ctx.destination);
-                        osc.start(now + idx * 0.08);
-                        osc.stop(now + idx * 0.08 + 0.25);
-                    });
-                } catch(e) {}
-            },
-            playClick() {
-                try {
-                    this.init();
-                    const now = this.ctx.currentTime;
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(400, now);
-                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.04);
-                    gain.gain.setValueAtTime(0.1, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.04);
-                } catch(e) {}
-            }
-        };
-
-        window.addEventListener('touchstart', function unlockAudio() {
-            AudioFX.init();
-            window.removeEventListener('touchstart', unlockAudio);
-        }, { once: true });
-        window.addEventListener('click', function unlockAudioClick() {
-            AudioFX.init();
-            window.removeEventListener('click', unlockAudioClick);
-        }, { once: true });
-
-        // Storage Engine
-        const StorageManager = {
-            STORAGE_KEY: 'REWARD_ISLAND_USER_SESSION',
-            ALL_DATA_KEY: 'REWARD_ISLAND_ALL_SESSIONS_LOG',
-
-            generateID() {
-                return 'EXP-' + Math.floor(100000 + Math.random() * 900000);
-            },
-
-            saveCurrentState() {
-                try {
-                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(appState));
-                    this.saveToGlobalLog(appState);
-                } catch(e) {}
-            },
-
-            loadCurrentState() {
-                try {
-                    const raw = localStorage.getItem(this.STORAGE_KEY);
-                    return raw ? JSON.parse(raw) : null;
-                } catch(e) { return null; }
-            },
-
-            saveToGlobalLog(state) {
-                if(!state.participantId) return;
-                try {
-                    let logs = JSON.parse(localStorage.getItem(this.ALL_DATA_KEY) || '[]');
-                    const existingIdx = logs.findIndex(l => l.participantId === state.participantId);
-                    if (existingIdx >= 0) {
-                        logs[existingIdx] = state;
-                    } else {
-                        logs.push(state);
-                    }
-                    localStorage.setItem(this.ALL_DATA_KEY, JSON.stringify(logs));
-                } catch(e) {}
-            },
-
-            getAllSessions() {
-                try {
-                    return JSON.parse(localStorage.getItem(this.ALL_DATA_KEY) || '[]');
-                } catch(e) { return []; }
-            },
-
-            clearAllData() {
-                localStorage.removeItem(this.STORAGE_KEY);
-                localStorage.removeItem(this.ALL_DATA_KEY);
-            }
-        };
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedState = StorageManager.loadCurrentState();
-            if (savedState && savedState.participantId && savedState.currentPhase > 0 && savedState.currentPhase < 5) {
-                showResumeModal(savedState);
-            } else {
-                initNewSession();
-                renderWelcomeScreen();
-            }
-        });
-
-        function initNewSession() {
-            appState = {
-                participantId: StorageManager.generateID(),
-                startTime: new Date().toISOString(),
-                endTime: null,
-                currentPhase: 0,
-                points: 0,
-                completedPhases: [false, false, false, false],
-                responses: { phase1: [], phase2: [], phase3: [], phase4: [] }
-            };
-            updateHeaderUI();
-        }
-
-        function updateHeaderUI() {
-            const partBadge = document.getElementById('participantBadge');
-            const scoreBadge = document.getElementById('scoreBadge');
-            const pointsEl = document.getElementById('currentPoints');
-            const partIdEl = document.getElementById('displayPartId');
-
-            if (appState.currentPhase > 0) {
-                partBadge.classList.remove('hidden');
-                scoreBadge.classList.remove('hidden');
-                pointsEl.textContent = appState.points;
-                partIdEl.textContent = `ID: ${appState.participantId}`;
-            } else {
-                partBadge.classList.add('hidden');
-                scoreBadge.classList.add('hidden');
-            }
-        }
-
-        function showResumeModal(savedState) {
-            const modal = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
-            modal.classList.remove('hidden');
-            content.innerHTML = `
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl border-4 border-yellow-300">
-                        <i class="fa-solid fa-rotate-left"></i>
-                    </div>
-                    <h3 class="text-2xl font-black text-slate-800 mb-2">Partida Encontrada</h3>
-                    <p class="text-sm text-slate-600 mb-6 font-medium">Tienes una sesión guardada (ID: <span class="font-bold text-sky-600">${savedState.participantId}</span>). ¿Deseas continuar en el Territorio ${savedState.currentPhase}?</p>
-                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                        <button onclick="resumeSession()" class="btn-game px-5 py-3 bg-green-400 hover:bg-green-300 text-green-950 border-green-600 font-bold rounded-2xl shadow-sm transition">
-                            <i class="fa-solid fa-play mr-2"></i> Continuar Aventura
-                        </button>
-                        <button onclick="startFreshSession()" class="btn-game px-5 py-3 bg-slate-200 hover:bg-slate-100 text-slate-700 border-slate-400 font-bold rounded-2xl transition">
-                            Reiniciar
-                        </button>
-                    </div>
-                </div>
-            `;
-            window.tempSavedState = savedState;
-        }
-
-        function resumeSession() {
-            appState = window.tempSavedState;
-            document.getElementById('modalOverlay').classList.add('hidden');
-            updateHeaderUI();
-            renderMap();
-        }
-
-        function startFreshSession() {
-            document.getElementById('modalOverlay').classList.add('hidden');
-            initNewSession();
-            renderWelcomeScreen();
-        }
-
-        // ==========================================
-        // VIEW 0: WELCOME & CONSENT
-        // ==========================================
-        function renderWelcomeScreen() {
-            const container = document.getElementById('appContainer');
-            container.innerHTML = `
-                <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-10 shadow-2xl text-center relative overflow-hidden">
-                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-100 border-2 border-sky-300 text-sky-700 text-xs font-bold mb-6 animate-pulse-subtle">
-                        <i class="fa-solid fa-star text-yellow-500"></i> Evaluación Conductual Gamificada
-                    </div>
-
-                    <h1 class="text-4xl sm:text-6xl font-black text-sky-500 mb-3 tracking-tight" style="text-shadow: 2px 2px 0px #bae6fd;">
-                        REWARD ISLAND
-                    </h1>
-                    <p class="text-lg text-slate-500 font-bold mb-8">
-                        «Cada decisión te acerca a un nuevo tesoro»
-                    </p>
-
-                    <div class="my-6 mx-auto max-w-sm rounded-3xl bg-sky-50 p-4 border-4 border-sky-200 shadow-sm relative">
-                        <svg class="w-full h-40" viewBox="0 0 400 200" fill="none">
-                            <path d="M20,160 Q100,140 200,160 T380,160 L400,200 L0,200 Z" fill="#7dd3fc" opacity="0.8"/>
-                            <path d="M30,155 Q70,75 160,85 T310,95 Q370,135 360,170 Q200,190 30,155 Z" fill="#fde047"/>
-                            <path d="M40,150 Q70,70 160,80 T300,90 Q360,130 350,165 Q200,185 40,150 Z" fill="#4ade80" stroke="#22c55e" stroke-width="4"/>
-                            <polygon points="180,90 220,30 260,90" fill="#22c55e" stroke="#16a34a" stroke-width="3"/>
-                            <polygon points="210,45 220,30 230,45" fill="#ffffff"/>
-                            <circle cx="100" cy="110" r="16" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
-                            <circle cx="125" cy="120" r="20" fill="#22c55e" stroke="#16a34a" stroke-width="2"/>
-                            <circle cx="300" cy="120" r="18" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
-                            <rect x="210" y="140" width="28" height="20" rx="4" fill="#facc15" stroke="#ca8a04" stroke-width="3"/>
-                            <path d="M210,150 H238" stroke="#ca8a04" stroke-width="3"/>
-                            <circle cx="224" cy="150" r="3" fill="#ffffff"/>
-                            <path d="M80,140 Q150,120 200,145" stroke="#ffffff" stroke-width="4" stroke-dasharray="8,8" fill="none"/>
-                        </svg>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left mb-8">
-                        <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-200">
-                            <div class="text-yellow-600 font-black mb-1 flex items-center gap-2"><i class="fa-solid fa-clock text-xl"></i> 15 Min</div>
-                            <div class="text-xs text-slate-600 font-medium">Duración aproximada total.</div>
-                        </div>
-                        <div class="bg-green-50 p-4 rounded-2xl border-2 border-green-200">
-                            <div class="text-green-600 font-black mb-1 flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-xl"></i> 4 Fases</div>
-                            <div class="text-xs text-slate-600 font-medium">Mapas, esfuerzo, cofres y rutas.</div>
-                        </div>
-                        <div class="bg-sky-50 p-4 rounded-2xl border-2 border-sky-200">
-                            <div class="text-sky-600 font-black mb-1 flex items-center gap-2"><i class="fa-solid fa-user-ninja text-xl"></i> Anónimo</div>
-                            <div class="text-xs text-slate-600 font-medium">Sin datos personales guardados.</div>
-                        </div>
-                    </div>
-
-                    <button onclick="showConsentModal()" class="btn-game w-full sm:w-auto px-10 py-4 bg-yellow-400 hover:bg-yellow-300 text-yellow-950 font-black text-xl border-yellow-500 rounded-2xl shadow-md transition transform hover:scale-105 flex items-center justify-center gap-3 mx-auto">
-                        <span>COMENZAR AVENTURA</span>
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                </div>
-            `;
-        }
-
-        function showConsentModal() {
-            AudioFX.playClick();
-            const modal = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
-            modal.classList.remove('hidden');
-            content.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3 pb-4 border-b-2 border-amber-100">
-                        <div class="w-12 h-12 bg-sky-100 text-sky-500 rounded-2xl flex items-center justify-center text-2xl border-2 border-sky-300">
-                            <i class="fa-solid fa-clipboard-check"></i>
-                        </div>
-                        <h3 class="text-xl font-black text-slate-800">Consentimiento Informativo</h3>
-                    </div>
-                    
-                    <div class="text-sm text-slate-600 font-medium space-y-3 max-h-60 overflow-y-auto p-4 bg-slate-50 rounded-2xl border-2 border-slate-200">
-                        <p><strong>Objetivo:</strong> Esta experiencia gamificada mide la toma de decisiones y elecciones conductuales ante distintas oportunidades de recompensa.</p>
-                        <p><strong>Registro de datos:</strong> Se guardarán tus elecciones y tiempos de reacción bajo el código anónimo <span class="text-sky-600 font-black bg-sky-100 px-2 py-0.5 rounded border border-sky-200">${appState.participantId}</span>. No se solicitará DNI, nombre ni correo.</p>
-                        <p><strong>Aviso Importante:</strong> Esta herramienta es un instrumento experimental educativo. Las puntuaciones no constituyen un test psicométrico validado ni realizan diagnósticos clínicos.</p>
-                    </div>
-
-                    <div class="flex items-start gap-3 pt-2 bg-yellow-50 p-3 rounded-xl border border-yellow-200">
-                        <input type="checkbox" id="consentCheck" class="mt-1 w-5 h-5 accent-green-500 cursor-pointer">
-                        <label for="consentCheck" class="text-xs font-bold text-slate-700 cursor-pointer">
-                            Acepto participar voluntariamente en esta tarea experimental anónima.
-                        </label>
-                    </div>
-
-                    <div class="flex gap-3 justify-end pt-4">
-                        <button onclick="closeModal()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-bold rounded-xl transition">
-                            Cancelar
-                        </button>
-                        <button onclick="confirmConsent()" class="btn-game px-6 py-3 bg-green-400 hover:bg-green-300 text-green-950 text-sm font-black border-green-600 rounded-xl transition shadow-sm">
-                            ¡Aceptar y Jugar!
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.add('hidden');
-        }
-
-        function confirmConsent() {
-            const check = document.getElementById('consentCheck');
-            if (!check || !check.checked) {
-                alert("Por favor, acepta el consentimiento para continuar.");
-                return;
-            }
-            closeModal();
-            appState.currentPhase = 1;
-            StorageManager.saveCurrentState();
-            updateHeaderUI();
-            renderMap();
-        }
-
-        // ==========================================
-        // MAP ROUTER
-        // ==========================================
-        function renderMap() {
-            const container = document.getElementById('appContainer');
-            
-            const allDone = appState.completedPhases.every(p => p === true);
-            if (allDone) {
-                renderFinalResults();
-                return;
-            }
-
-            container.innerHTML = `
-                <div class="max-w-4xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl relative">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-                        <div>
-                            <span class="text-xs font-black text-sky-500 uppercase tracking-widest bg-sky-100 px-3 py-1 rounded-full border border-sky-200">Mapa de la Isla</span>
-                            <h2 class="text-2xl sm:text-4xl font-black text-slate-800 mt-2">Elige tu territorio</h2>
-                        </div>
-                        <div class="bg-yellow-100 px-4 py-2 rounded-2xl border-2 border-yellow-300 text-sm font-bold text-yellow-700">
-                            Progreso: <span class="text-yellow-600 text-lg">${appState.completedPhases.filter(Boolean).length} / 4</span>
-                        </div>
-                    </div>
-
-                    <div class="relative w-full aspect-[16/9] rounded-3xl border-4 border-sky-300 overflow-hidden shadow-inner island-bg">
-                        <svg class="w-full h-full" viewBox="0 0 800 450">
-                            <circle cx="150" cy="100" r="40" fill="#bae6fd" opacity="0.4"/>
-                            <circle cx="650" cy="350" r="60" fill="#bae6fd" opacity="0.3"/>
-                            
-                            <path d="M 120 220 Q 180 80 400 90 T 700 200 Q 750 320 580 380 T 220 370 Q 80 320 120 220 Z" fill="#fde047" stroke="#eab308" stroke-width="8"/>
-                            <path d="M 140 215 Q 190 100 390 105 T 680 205 Q 730 310 570 360 T 230 350 Q 100 310 140 215 Z" fill="#4ade80" stroke="#22c55e" stroke-width="4"/>
-
-                            <circle cx="300" cy="150" r="25" fill="#22c55e" stroke="#16a34a" stroke-width="3"/>
-                            <polygon points="500,200 550,100 600,200" fill="#22c55e" stroke="#16a34a" stroke-width="4"/>
-                            <polygon points="530,140 550,100 570,140" fill="#ffffff"/>
-
-                            <path d="M 220,270 L 340,160 L 520,180 L 600,290" stroke="#ffffff" stroke-width="5" stroke-dasharray="10,10" fill="none"/>
-                        </svg>
-
-                        <!-- Territorio 1 -->
-                        <div class="absolute left-[22%] top-[55%] -translate-x-1/2 -translate-y-1/2 text-center">
-                            <button onclick="startPhase(1)" class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform hover:scale-110 shadow-md ${appState.completedPhases[0] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
-                                ${appState.completedPhases[0] ? '<i class="fa-solid fa-check"></i>' : '1'}
-                            </button>
-                            <span class="block mt-3 text-xs font-black bg-white px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-700 shadow-sm">
-                                El Mapa del Tesoro
-                            </span>
-                        </div>
-
-                        <!-- Territorio 2 -->
-                        <div class="absolute left-[40%] top-[30%] -translate-x-1/2 -translate-y-1/2 text-center">
-                            <button onclick="startPhase(2)" ${!appState.completedPhases[0] ? 'disabled' : ''} 
-                                class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform ${!appState.completedPhases[0] ? 'bg-slate-200 text-slate-400 border-slate-300 opacity-80 cursor-not-allowed' : appState.completedPhases[1] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
-                                ${appState.completedPhases[1] ? '<i class="fa-solid fa-check">' : !appState.completedPhases[0] ? '<i class="fa-solid fa-lock text-xl"></i>' : '2'}
-                            </button>
-                            <span class="block mt-3 text-xs font-black bg-white px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-700 shadow-sm">
-                                El Desafío
-                            </span>
-                        </div>
-
-                        <!-- Territorio 3 -->
-                        <div class="absolute left-[65%] top-[35%] -translate-x-1/2 -translate-y-1/2 text-center">
-                            <button onclick="startPhase(3)" ${!appState.completedPhases[1] ? 'disabled' : ''} 
-                                class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform ${!appState.completedPhases[1] ? 'bg-slate-200 text-slate-400 border-slate-300 opacity-80 cursor-not-allowed' : appState.completedPhases[2] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
-                                ${appState.completedPhases[2] ? '<i class="fa-solid fa-check">' : !appState.completedPhases[1] ? '<i class="fa-solid fa-lock text-xl"></i>' : '3'}
-                            </button>
-                            <span class="block mt-3 text-xs font-black bg-white px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-700 shadow-sm">
-                                Los Cofres
-                            </span>
-                        </div>
-
-                        <!-- Territorio 4 -->
-                        <div class="absolute left-[75%] top-[62%] -translate-x-1/2 -translate-y-1/2 text-center">
-                            <button onclick="startPhase(4)" ${!appState.completedPhases[2] ? 'disabled' : ''} 
-                                class="btn-game w-16 h-16 rounded-full flex items-center justify-center font-black text-2xl transition transform ${!appState.completedPhases[2] ? 'bg-slate-200 text-slate-400 border-slate-300 opacity-80 cursor-not-allowed' : appState.completedPhases[3] ? 'bg-green-400 text-green-900 border-green-600' : 'bg-yellow-400 text-yellow-900 border-yellow-600 animate-bounce'}">
-                                ${appState.completedPhases[3] ? '<i class="fa-solid fa-check">' : !appState.completedPhases[2] ? '<i class="fa-solid fa-lock text-xl"></i>' : '4'}
-                            </button>
-                            <span class="block mt-3 text-xs font-black bg-white px-3 py-1.5 rounded-xl border-2 border-slate-200 text-slate-700 shadow-sm">
-                                La Última Expedición
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex flex-col sm:flex-row justify-between items-center bg-sky-50 p-4 rounded-2xl border-2 border-sky-200 gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-sky-200 text-sky-600 rounded-full flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-info"></i></div>
-                            <span class="text-sm text-slate-700 font-bold">Toca el número amarillo para iniciar el siguiente territorio.</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function startPhase(phaseNum) {
-            AudioFX.playClick();
-            appState.currentPhase = phaseNum;
-            StorageManager.saveCurrentState();
-            
-            if (phaseNum === 1) runPhase1();
-            else if (phaseNum === 2) runPhase2();
-            else if (phaseNum === 3) runPhase3();
-            else if (phaseNum === 4) runPhase4();
-        }
-
-        // ==========================================
-        // FASE 1: EL MAPA DEL TESORO (Aproximación a la recompensa)
-        // Balanced Expected Values: Option A EV = Option B EV
-        // ==========================================
-        const phase1Trials = [
-            { trialId: 1, optionA: { points: 10, prob: 0.9, text: "Sendero Seguro" }, optionB: { points: 30, prob: 0.3, text: "Risco Escarpado" } }, // EV = 9
-            { trialId: 2, optionA: { points: 12, prob: 0.75, text: "Ruta Directa" }, optionB: { points: 36, prob: 0.25, text: "Bosque Oscuro" } }, // EV = 9
-            { trialId: 3, optionA: { points: 15, prob: 0.8, text: "Camino Rocoso" }, optionB: { points: 30, prob: 0.4, text: "Cueva del Tesoro" } }, // EV = 12
-            { trialId: 4, optionA: { points: 20, prob: 0.7, text: "Playa Tranquila" }, optionB: { points: 40, prob: 0.35, text: "Isla Calavera" } }, // EV = 14
-            { trialId: 5, optionA: { points: 8, prob: 0.9, text: "Atajo Limpio" }, optionB: { points: 24, prob: 0.3, text: "Valle de Niebla" } }    // EV = 7.2
-        ];
-        let p1CurrentIdx = 0;
-        let p1StartTime = 0;
-
-        function runPhase1() {
-            p1CurrentIdx = 0;
-            renderP1Trial();
-        }
-
-        function renderP1Trial() {
-            if (p1CurrentIdx >= phase1Trials.length) {
-                appState.completedPhases[0] = true;
-                appState.currentPhase = 2;
-                StorageManager.saveCurrentState();
-                showPhaseCompleteModal("¡Zona Completada!", "Has explorado todos los caminos del primer territorio.", () => renderMap());
-                return;
-            }
-
-            const trial = phase1Trials[p1CurrentIdx];
-            p1StartTime = performance.now();
-
-            const container = document.getElementById('appContainer');
-            container.innerHTML = `
-                <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl">
-                    <div class="flex justify-between items-center mb-6 border-b-2 border-amber-100 pb-4">
-                        <span class="text-xs font-black text-amber-500 uppercase tracking-widest bg-amber-50 px-3 py-1 rounded-full border border-amber-200"><i class="fa-solid fa-map"></i> Territorio 1</span>
-                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Elección ${p1CurrentIdx + 1} / ${phase1Trials.length}</span>
-                    </div>
-
-                    <h3 class="text-2xl font-black text-slate-800 mb-2">Elige un camino a explorar</h3>
-                    <p class="text-sm text-slate-600 font-medium mb-6">Ambas opciones ofrecen oportunidades equilibradas. ¿Cuál prefieres?</p>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
-                        <!-- Option A -->
-                        <div onclick="selectP1Option('A')" class="group cursor-pointer bg-white border-4 border-slate-200 hover:border-yellow-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col items-center text-center relative">
-                            <div class="w-20 h-20 rounded-3xl bg-yellow-100 text-yellow-500 border-2 border-yellow-200 flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition">
-                                <i class="fa-solid fa-vault"></i>
-                            </div>
-                            <h4 class="font-black text-xl text-slate-700 mb-1">${trial.optionA.text}</h4>
-                            <div class="text-3xl font-black text-yellow-500 mb-4 bg-yellow-50 px-4 py-1 rounded-xl border border-yellow-200">+${trial.optionA.points} Pts</div>
-                            <div class="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden border border-slate-200">
-                                <div class="bg-green-400 h-full" style="width: ${trial.optionA.prob * 100}%"></div>
-                            </div>
-                            <span class="text-sm text-slate-500 font-bold">${Math.round(trial.optionA.prob * 100)}% de Probabilidad</span>
-                        </div>
-
-                        <!-- Option B -->
-                        <div onclick="selectP1Option('B')" class="group cursor-pointer bg-white border-4 border-slate-200 hover:border-sky-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col items-center text-center relative">
-                            <div class="w-20 h-20 rounded-3xl bg-sky-100 text-sky-500 border-2 border-sky-200 flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition">
-                                <i class="fa-solid fa-box-open"></i>
-                            </div>
-                            <h4 class="font-black text-xl text-slate-700 mb-1">${trial.optionB.text}</h4>
-                            <div class="text-3xl font-black text-sky-500 mb-4 bg-sky-50 px-4 py-1 rounded-xl border border-sky-200">+${trial.optionB.points} Pts</div>
-                            <div class="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden border border-slate-200">
-                                <div class="bg-green-400 h-full" style="width: ${trial.optionB.prob * 100}%"></div>
-                            </div>
-                            <span class="text-sm text-slate-500 font-bold">${Math.round(trial.optionB.prob * 100)}% de Probabilidad</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function selectP1Option(choiceKey) {
-            const rt = Math.round(performance.now() - p1StartTime);
-            const trial = phase1Trials[p1CurrentIdx];
-            const chosenObj = choiceKey === 'A' ? trial.optionA : trial.optionB;
-
-            const success = Math.random() <= chosenObj.prob;
-            const pointsEarned = success ? chosenObj.points : 0;
-            appState.points += pointsEarned;
-            updateHeaderUI();
-
-            appState.responses.phase1.push({
-                trialId: trial.trialId,
-                chosenOption: choiceKey,
-                pointsTarget: chosenObj.points,
-                prob: chosenObj.prob,
-                rtMs: rt,
-                success: success,
-                pointsEarned: pointsEarned
-            });
-
-            if (success) AudioFX.playCoin();
-            else AudioFX.playClick();
-
-            const container = document.getElementById('appContainer');
-            container.innerHTML = `
-                <div class="max-w-md w-full bg-white border-4 ${success ? 'border-yellow-300' : 'border-slate-300'} rounded-3xl p-8 text-center shadow-xl">
-                    <div class="w-24 h-24 rounded-full mx-auto flex items-center justify-center text-5xl mb-6 ${success ? 'bg-yellow-100 text-yellow-500 border-4 border-yellow-400 chest-bounce' : 'bg-slate-100 text-slate-400 border-4 border-slate-300'}">
-                        <i class="fa-solid ${success ? 'fa-coins' : 'fa-box-open'}"></i>
-                    </div>
-                    <h3 class="text-3xl font-black ${success ? 'text-yellow-500' : 'text-slate-500'} mb-2">
-                        ${success ? '¡Encontraste Tesoro!' : 'Cofre Vacío'}
-                    </h3>
-                    <p class="text-base text-slate-600 font-medium mb-8">
-                        ${success ? `Añades <strong class="text-yellow-600 bg-yellow-100 px-2 py-1 rounded-lg text-lg">+${pointsEarned} puntos</strong>.` : 'Esta ruta no tenía recompensas esta vez.'}
-                    </p>
-                    <button onclick="nextP1Trial()" class="btn-game w-full py-4 bg-green-400 hover:bg-green-300 text-green-950 text-lg font-black border-green-600 rounded-2xl transition">
-                        Continuar <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-            `;
-        }
-
-        function nextP1Trial() {
-            p1CurrentIdx++;
-            renderP1Trial();
-        }
-
-        // ==========================================
-        // FASE 2: EL DESAFÍO (Motivación y Esfuerzo)
-        // Track: initiation, accuracy, completion, effort choice, abandons
-        // ==========================================
-        const phase2Trials = [
-            { trialId: 1, easy: { count: 4, points: 6 }, hard: { count: 10, points: 18 } },
-            { trialId: 2, easy: { count: 4, points: 6 }, hard: { count: 10, points: 18 } },
-            { trialId: 3, easy: { count: 4, points: 6 }, hard: { count: 10, points: 18 } }
-        ];
-        let p2CurrentTrialIdx = 0;
-        let p2ChoiceStartTime = 0;
-        let p2CurrentTaskState = null;
-
-        function runPhase2() {
-            p2CurrentTrialIdx = 0;
-            renderP2Choice();
-        }
-
-        function renderP2Choice() {
-            if (p2CurrentTrialIdx >= phase2Trials.length) {
-                appState.completedPhases[1] = true;
-                appState.currentPhase = 3;
-                StorageManager.saveCurrentState();
-                showPhaseCompleteModal("¡Desafíos Superados!", "Has completado la zona de esfuerzo.", () => renderMap());
-                return;
-            }
-
-            const trial = phase2Trials[p2CurrentTrialIdx];
-            p2ChoiceStartTime = performance.now();
-
-            const container = document.getElementById('appContainer');
-            container.innerHTML = `
-                <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl">
-                    <div class="flex justify-between items-center mb-6 border-b-2 border-amber-100 pb-4">
-                        <span class="text-xs font-black text-amber-500 uppercase tracking-widest bg-amber-50 px-3 py-1 rounded-full border border-amber-200"><i class="fa-solid fa-dumbbell"></i> Territorio 2</span>
-                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Desafío ${p2CurrentTrialIdx + 1} / ${phase2Trials.length}</span>
-                    </div>
-
-                    <h3 class="text-2xl font-black text-slate-800 mb-2">Selecciona un tipo de desafío</h3>
-                    <p class="text-sm text-slate-600 font-medium mb-6">Elige el nivel de esfuerzo que deseas invertir para obtener puntos.</p>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
-                        <!-- Easy -->
-                        <div onclick="startP2Task('EASY')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-green-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
-                            <div>
-                                <span class="inline-block px-3 py-1 rounded-xl bg-green-100 text-green-700 border border-green-200 text-xs font-black mb-4">ESFUERZO MODERADO</span>
-                                <h4 class="font-black text-xl text-slate-700">${trial.easy.count} Operaciones</h4>
-                                <p class="text-sm text-slate-500 font-medium mt-2">Menor número de repeticiones.</p>
-                            </div>
-                            <div class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
-                                <span class="text-3xl font-black text-green-500">+${trial.easy.points} Pts</span>
-                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-lg"><i class="fa-solid fa-play"></i></div>
-                            </div>
-                        </div>
-
-                        <!-- Hard -->
-                        <div onclick="startP2Task('HARD')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-yellow-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
-                            <div>
-                                <span class="inline-block px-3 py-1 rounded-xl bg-yellow-100 text-yellow-700 border border-yellow-200 text-xs font-black mb-4">ALTO ESFUERZO</span>
-                                <h4 class="font-black text-xl text-slate-700">${trial.hard.count} Operaciones</h4>
-                                <p class="text-sm text-slate-500 font-medium mt-2">Mayor persistencia requerida.</p>
-                            </div>
-                            <div class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
-                                <span class="text-3xl font-black text-yellow-500">+${trial.hard.points} Pts</span>
-                                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-lg"><i class="fa-solid fa-play"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function startP2Task(type) {
-            const rtChoice = Math.round(performance.now() - p2ChoiceStartTime);
-            const trial = phase2Trials[p2CurrentTrialIdx];
-            const config = type === 'EASY' ? trial.easy : trial.hard;
-
-            p2CurrentTaskState = {
-                type: type,
-                totalRequired: config.count,
-                points: config.points,
-                completed: 0,
-                correct: 0,
-                incorrect: 0,
-                choiceRt: rtChoice,
-                startTime: performance.now(),
-                currentMath: null
-            };
-
-            renderP2TaskScreen();
-        }
-
-        function generateMathProblem() {
-            const a = Math.floor(Math.random() * 10) + 2;
-            const b = Math.floor(Math.random() * 10) + 2;
-            return { question: `${a} + ${b} = ?`, answer: a + b };
-        }
-
-        function renderP2TaskScreen() {
-            if (p2CurrentTaskState.completed >= p2CurrentTaskState.totalRequired) {
-                const totalTaskTime = Math.round(performance.now() - p2CurrentTaskState.startTime);
-                appState.points += p2CurrentTaskState.points;
-                updateHeaderUI();
-                AudioFX.playSuccess();
-
-                appState.responses.phase2.push({
-                    trialId: phase2Trials[p2CurrentTrialIdx].trialId,
-                    choiceType: p2CurrentTaskState.type,
-                    choiceRtMs: p2CurrentTaskState.choiceRt,
-                    completed: p2CurrentTaskState.completed,
-                    totalRequired: p2CurrentTaskState.totalRequired,
-                    correct: p2CurrentTaskState.correct,
-                    incorrect: p2CurrentTaskState.incorrect,
-                    taskTimeMs: totalTaskTime,
-                    abandoned: false,
-                    started: true,
-                    pointsEarned: p2CurrentTaskState.points
-                });
-
-                p2CurrentTrialIdx++;
-                renderP2Choice();
-                return;
-            }
-
-            p2CurrentTaskState.currentMath = generateMathProblem();
-            const container = document.getElementById('appContainer');
-
-            container.innerHTML = `
-                <div class="max-w-md w-full bg-white border-4 border-sky-200 rounded-3xl p-6 sm:p-8 shadow-xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-xs font-black text-sky-500 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-xl">Progreso de Operaciones</span>
-                        <span class="text-sm text-slate-600 font-black bg-slate-100 px-3 py-1 rounded-xl border border-slate-200">${p2CurrentTaskState.completed} / ${p2CurrentTaskState.totalRequired}</span>
-                    </div>
-
-                    <div class="w-full bg-slate-100 rounded-full h-4 mb-6 overflow-hidden border-2 border-slate-200 p-0.5">
-                        <div class="bg-sky-400 h-full rounded-full transition-all duration-300" style="width: ${(p2CurrentTaskState.completed / p2CurrentTaskState.totalRequired) * 100}%"></div>
-                    </div>
-
-                    <div class="bg-sky-50 p-6 rounded-3xl border-4 border-sky-100 text-center mb-8 shadow-inner">
-                        <span class="text-xs text-sky-600 uppercase font-black tracking-widest block mb-3">Calcula:</span>
-                        <div class="text-5xl font-black text-slate-800 tracking-tight">${p2CurrentTaskState.currentMath.question}</div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mb-8">
-                        ${[
-                            p2CurrentTaskState.currentMath.answer,
-                            p2CurrentTaskState.currentMath.answer + 2,
-                            p2CurrentTaskState.currentMath.answer - 1,
-                            p2CurrentTaskState.currentMath.answer + 4
-                        ].sort(() => Math.random() - 0.5).map(ans => `
-                            <button onclick="submitP2Answer(${ans})" class="btn-game py-4 bg-white hover:bg-slate-50 text-slate-700 font-black text-2xl rounded-2xl border-4 border-slate-200 active:border-slate-300 transition">
-                                ${ans}
-                            </button>
-                        `).join('')}
-                    </div>
-
-                    <button onclick="abandonP2Task()" class="w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-bold rounded-2xl border-2 border-rose-200 transition">
-                        <i class="fa-solid fa-flag mr-1"></i> Abandonar Desafío
-                    </button>
-                </div>
-            `;
-        }
-
-        function submitP2Answer(ans) {
-            AudioFX.playClick();
-            if (ans === p2CurrentTaskState.currentMath.answer) {
-                p2CurrentTaskState.correct++;
-            } else {
-                p2CurrentTaskState.incorrect++;
-            }
-            p2CurrentTaskState.completed++;
-            renderP2TaskScreen();
-        }
-
-        function abandonP2Task() {
-            const totalTaskTime = Math.round(performance.now() - p2CurrentTaskState.startTime);
-            appState.responses.phase2.push({
-                trialId: phase2Trials[p2CurrentTrialIdx].trialId,
-                choiceType: p2CurrentTaskState.type,
-                choiceRtMs: p2CurrentTaskState.choiceRt,
-                completed: p2CurrentTaskState.completed,
-                totalRequired: p2CurrentTaskState.totalRequired,
-                correct: p2CurrentTaskState.correct,
-                incorrect: p2CurrentTaskState.incorrect,
-                taskTimeMs: totalTaskTime,
-                abandoned: true,
-                started: true,
-                pointsEarned: 0
-            });
-
-            p2CurrentTrialIdx++;
-            renderP2Choice();
-        }
-
-        // ==========================================
-        // FASE 3: LA APERTURA DE LOS COFRES (Respuesta ante la recompensa)
-        // Measure post-win vs post-non-win RT & willingness to continue
-        // ==========================================
-        const phase3Trials = [
-            { trialId: 1, win: true, points: 20 },
-            { trialId: 2, win: false, points: 0 },
-            { trialId: 3, win: true, points: 20 },
-            { trialId: 4, win: false, points: 0 },
-            { trialId: 5, win: true, points: 20 }
-        ];
-        let p3CurrentIdx = 0;
-        let p3PostTaskStartTime = 0;
-
-        function runPhase3() {
-            p3CurrentIdx = 0;
-            renderP3ChestOpen();
-        }
-
-        function renderP3ChestOpen() {
-            if (p3CurrentIdx >= phase3Trials.length) {
-                appState.completedPhases[2] = true;
-                appState.currentPhase = 4;
-                StorageManager.saveCurrentState();
-                showPhaseCompleteModal("¡Cofres Revisados!", "Has finalizado el tercer territorio.", () => renderMap());
-                return;
-            }
-
-            const trial = phase3Trials[p3CurrentIdx];
-            if (trial.win) appState.points += trial.points;
-            updateHeaderUI();
-
-            const container = document.getElementById('appContainer');
-            container.innerHTML = `
-                <div class="max-w-md w-full bg-white border-4 ${trial.win ? 'border-yellow-300' : 'border-slate-200'} rounded-3xl p-6 sm:p-10 shadow-xl text-center">
-                    <div class="flex justify-between items-center mb-6 border-b-2 border-slate-100 pb-3">
-                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-xl">Ensayo ${p3CurrentIdx + 1} / ${phase3Trials.length}</span>
-                    </div>
-
-                    <div class="w-32 h-32 rounded-full mx-auto flex items-center justify-center text-6xl mb-6 shadow-sm ${trial.win ? 'bg-yellow-100 text-yellow-500 border-4 border-yellow-300 chest-bounce' : 'bg-slate-100 text-slate-400 border-4 border-slate-200'}">
-                        <i class="fa-solid ${trial.win ? 'fa-gem' : 'fa-box-open'}"></i>
-                    </div>
-
-                    <h3 class="text-3xl font-black ${trial.win ? 'text-yellow-500' : 'text-slate-500'} mb-3">
-                        ${trial.win ? `¡+${trial.points} Puntos!` : 'Sin Recompensa'}
-                    </h3>
-                    <p class="text-sm text-slate-600 font-medium mb-8">
-                        ${trial.win ? '¡Resultado gratificante! Continúa con la tarea de reacción.' : 'Ensayo sin premio. Continúa con la tarea de reacción.'}
-                    </p>
-
-                    <button onclick="renderP3PostTask()" class="btn-game w-full py-4 bg-sky-400 hover:bg-sky-300 text-sky-950 font-black text-lg border-sky-600 rounded-2xl shadow-sm transition">
-                        Siguiente Actividad <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            `;
-        }
-
-        function renderP3PostTask() {
-            p3PostTaskStartTime = performance.now();
-            const targetSymbol = ['★', '▲', '■', '◆'][Math.floor(Math.random() * 4)];
-            
-            const container = document.getElementById('appContainer');
-            container.innerHTML = `
-                <div class="max-w-md w-full bg-white border-4 border-sky-200 rounded-3xl p-6 sm:p-8 shadow-xl text-center">
-                    <span class="inline-block px-4 py-1.5 rounded-full bg-sky-100 text-sky-700 font-black text-xs uppercase tracking-widest mb-4">Tarea de Reacción</span>
-                    <h3 class="text-xl font-black text-slate-800 mb-6">Toca el símbolo indicado lo antes posible</h3>
-
-                    <div class="bg-sky-50 p-6 rounded-3xl border-4 border-sky-100 mb-8 shadow-inner">
-                        <span class="text-xs text-sky-600 font-bold block mb-2">Objetivo:</span>
-                        <span class="text-6xl text-slate-800 font-black">${targetSymbol}</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        ${['★', '▲', '■', '◆'].sort(() => Math.random() - 0.5).map(sym => `
-                            <button onclick="submitP3PostTask('${sym}', '${targetSymbol}')" class="btn-game py-6 bg-white hover:bg-slate-50 text-slate-700 font-black text-4xl rounded-2xl border-4 border-slate-200 active:border-slate-300 transition shadow-sm">
-                                ${sym}
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function submitP3PostTask(chosen, target) {
-            AudioFX.playClick();
-            const rt = Math.round(performance.now() - p3PostTaskStartTime);
-            const trial = phase3Trials[p3CurrentIdx];
-
-            appState.responses.phase3.push({
-                trialId: trial.trialId,
-                priorWin: trial.win,
-                priorPoints: trial.points,
-                rtMs: rt,
-                correct: chosen === target,
-                continued: true
-            });
-
-            p3CurrentIdx++;
-            renderP3ChestOpen();
-        }
-
-        // ==========================================
-        // FASE 4: LA ÚLTIMA EXPEDICIÓN (Búsqueda de Nuevas Oportunidades)
-        // Equivalent rewards (10 pts vs 10 pts) measuring novelty preference
-        // ==========================================
-        const phase4Trials = [
-            { trialId: 1, known: "Ruta Conocida (Familiar)", unknown: "Ruta Desconocida (Nueva)", points: 10 },
-            { trialId: 2, known: "Sendero Habitual (Tradicional)", unknown: "Atajo Misterioso (Nuevo)", points: 10 },
-            { trialId: 3, known: "Campamento Base (Familiar)", unknown: "Portal Mágico (Inédito)", points: 10 }
-        ];
-        let p4CurrentIdx = 0;
-        let p4StartTime = 0;
-
-        function runPhase4() {
-            p4CurrentIdx = 0;
-            renderP4Trial();
-        }
-
-        function renderP4Trial() {
-            if (p4CurrentIdx >= phase4Trials.length) {
-                appState.completedPhases[3] = true;
-                appState.currentPhase = 5;
-                appState.endTime = new Date().toISOString();
-                StorageManager.saveCurrentState();
-                renderFinalResults();
-                return;
-            }
-
-            const trial = phase4Trials[p4CurrentIdx];
-            p4StartTime = performance.now();
-
-            const container = document.getElementById('appContainer');
-            container.innerHTML = `
-                <div class="max-w-3xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl">
-                    <div class="flex justify-between items-center mb-6 border-b-2 border-amber-100 pb-4">
-                        <span class="text-xs font-black text-purple-500 uppercase tracking-widest bg-purple-50 px-3 py-1 rounded-full border border-purple-200"><i class="fa-solid fa-compass"></i> Territorio 4</span>
-                        <span class="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200">Elección ${p4CurrentIdx + 1} / ${phase4Trials.length}</span>
-                    </div>
-
-                    <h3 class="text-2xl font-black text-slate-800 mb-2">Selecciona tu ruta final</h3>
-                    <p class="text-sm text-slate-600 font-medium mb-8">Ambas opciones otorgan una recompensa equivalente de <span class="font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded">+${trial.points} Pts</span>.</p>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 my-6">
-                        <!-- Known -->
-                        <div onclick="selectP4Option('KNOWN')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-sky-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
-                            <div>
-                                <div class="w-16 h-16 rounded-2xl bg-sky-100 text-sky-500 border-2 border-sky-200 flex items-center justify-center text-3xl mb-4">
-                                    <i class="fa-solid fa-house"></i>
-                                </div>
-                                <span class="text-xs font-black text-sky-500 block mb-2 tracking-widest uppercase">Opción Conocida</span>
-                                <h4 class="font-black text-xl text-slate-700">${trial.known}</h4>
-                            </div>
-                            <div class="mt-8 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
-                                <span class="text-2xl font-black text-sky-500 bg-sky-50 px-3 py-1 rounded-xl">+${trial.points} Pts</span>
-                                <div class="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center text-sky-600 text-lg"><i class="fa-solid fa-check"></i></div>
-                            </div>
-                        </div>
-
-                        <!-- Unknown -->
-                        <div onclick="selectP4Option('UNKNOWN')" class="cursor-pointer bg-white border-4 border-slate-200 hover:border-purple-400 rounded-3xl p-6 transition transform hover:-translate-y-2 shadow-sm hover:shadow-lg flex flex-col justify-between">
-                            <div>
-                                <div class="w-16 h-16 rounded-2xl bg-purple-100 text-purple-500 border-2 border-purple-200 flex items-center justify-center text-3xl mb-4">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                </div>
-                                <span class="text-xs font-black text-purple-500 block mb-2 tracking-widest uppercase">Opción Novedosa</span>
-                                <h4 class="font-black text-xl text-slate-700">${trial.unknown}</h4>
-                            </div>
-                            <div class="mt-8 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
-                                <span class="text-2xl font-black text-purple-500 bg-purple-50 px-3 py-1 rounded-xl">+${trial.points} Pts</span>
-                                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-lg"><i class="fa-solid fa-magnifying-glass"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function selectP4Option(choice) {
-            AudioFX.playClick();
-            const rt = Math.round(performance.now() - p4StartTime);
-            const trial = phase4Trials[p4CurrentIdx];
-
-            appState.points += trial.points;
-            updateHeaderUI();
-
-            appState.responses.phase4.push({
-                trialId: trial.trialId,
-                choice: choice,
-                rtMs: rt,
-                pointsEarned: trial.points
-            });
-
-            p4CurrentIdx++;
-            renderP4Trial();
-        }
-
-        function showPhaseCompleteModal(title, msg, callback) {
-            const modal = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
-            modal.classList.remove('hidden');
-            content.innerHTML = `
-                <div class="text-center p-4">
-                    <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl border-4 border-green-300 chest-bounce">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <h3 class="text-3xl font-black text-slate-800 mb-3">${title}</h3>
-                    <p class="text-base font-medium text-slate-600 mb-8">${msg}</p>
-                    <button id="phaseModalBtn" class="btn-game px-8 py-4 bg-green-400 hover:bg-green-300 text-green-950 text-lg font-black border-green-600 rounded-2xl shadow-sm transition">
-                        Ver Mapa <i class="fa-solid fa-map ml-2"></i>
-                    </button>
-                </div>
-            `;
-            document.getElementById('phaseModalBtn').onclick = () => {
-                closeModal();
-                callback();
-            };
-        }
-
-        // ==========================================
-        // ALGORITMO DE PUNTUACIONES CONDUCTUALES (0-100)
-        // Basado estrictamente en conductas registradas
-        // ==========================================
-        function calculateIndicators(state) {
-            // 1. Aproximación a la Recompeensa (Proporción de elecciones de alta magnitud B)
-            let p1Score = 50;
-            if (state.responses.phase1 && state.responses.phase1.length > 0) {
-                const highMagChoices = state.responses.phase1.filter(r => r.chosenOption === 'B').length;
-                p1Score = Math.round((highMagChoices / state.responses.phase1.length) * 100);
-            }
-
-            // 2. Motivación y Persistencia (Elección de esfuerzo + tasa de finalización)
-            let p2Score = 50;
-            if (state.responses.phase2 && state.responses.phase2.length > 0) {
-                const hardChoices = state.responses.phase2.filter(r => r.choiceType === 'HARD').length;
-                const completedTasks = state.responses.phase2.filter(r => !r.abandoned && r.started).length;
+        function generarPlan() {
+            // Get values from textareas
+            const q1 = document.getElementById('q1').value.trim();
+            const q2 = document.getElementById('q2').value.trim();
+            const q3 = document.getElementById('q3').value.trim();
+            const q4 = document.getElementById('q4').value.trim();
+
+            // Validation (optional, but good UX)
+            if(!q1 && !q2 && !q3 && !q4) {
+                // Flash an alert cleanly in the UI instead of window.alert
+                const btn = document.querySelector('button[type="button"]');
+                const originalText = btn.innerText;
+                btn.innerText = "¡Por favor, rellena algún campo!";
+                btn.classList.replace('bg-brand-red', 'bg-orange-500');
                 
-                const effortRatio = hardChoices / state.responses.phase2.length;
-                const completionRatio = completedTasks / state.responses.phase2.length;
-                p2Score = Math.round((effortRatio * 0.5 + completionRatio * 0.5) * 100);
-            }
-
-            // 3. Respuesta ante la Recompensa (Diferencial de TR tras premio vs sin premio)
-            let p3Score = 50;
-            if (state.responses.phase3 && state.responses.phase3.length > 0) {
-                const winRTs = state.responses.phase3.filter(r => r.priorWin).map(r => r.rtMs);
-                const lossRTs = state.responses.phase3.filter(r => !r.priorWin).map(r => r.rtMs);
-
-                if (winRTs.length > 0 && lossRTs.length > 0) {
-                    const avgWin = winRTs.reduce((a,b) => a+b, 0) / winRTs.length;
-                    const avgLoss = lossRTs.reduce((a,b) => a+b, 0) / lossRTs.length;
-                    
-                    // Si el TR posterior al premio es menor (más rápido), refleja activación
-                    const diffMs = avgLoss - avgWin;
-                    p3Score = Math.min(100, Math.max(0, Math.round(50 + (diffMs / 15))));
-                }
-            }
-
-            // 4. Búsqueda de Nuevas Oportunidades (Proporción de opciones novedosas)
-            let p4Score = 50;
-            if (state.responses.phase4 && state.responses.phase4.length > 0) {
-                const unknownChoices = state.responses.phase4.filter(r => r.choice === 'UNKNOWN').length;
-                p4Score = Math.round((unknownChoices / state.responses.phase4.length) * 100);
-            }
-
-            return {
-                anticipation: p1Score,
-                persistence: p2Score,
-                responsiveness: p3Score,
-                novelty: p4Score
-            };
-        }
-
-        // ==========================================
-        // VIEW 5: PANTALLA FINAL DE RESULTADOS
-        // ==========================================
-        function renderFinalResults() {
-            const scores = calculateIndicators(appState);
-            const container = document.getElementById('appContainer');
-
-            container.innerHTML = `
-                <div class="max-w-4xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
-                    <div class="text-center">
-                        <span class="inline-block px-5 py-2 rounded-full bg-yellow-100 text-yellow-600 font-black text-sm uppercase tracking-widest border-2 border-yellow-300 mb-4">
-                            ¡ENHORABUENA! HAS COMPLETADO REWARD ISLAND
-                        </span>
-                        <h2 class="text-3xl sm:text-5xl font-black text-sky-500 mb-3" style="text-shadow: 2px 2px 0px #bae6fd;">PERFIL DE RESULTADOS</h2>
-                    </div>
-
-                    <div class="bg-yellow-50 p-6 rounded-3xl border-4 border-yellow-200 flex flex-col sm:flex-row justify-between items-center gap-6 shadow-inner">
-                        <div class="flex items-center gap-5">
-                            <div class="w-20 h-20 rounded-3xl bg-yellow-400 text-yellow-900 flex items-center justify-center text-4xl border-4 border-yellow-500 shadow-sm">
-                                <i class="fa-solid fa-crown"></i>
-                            </div>
-                            <div>
-                                <span class="text-sm text-yellow-700 block font-black uppercase tracking-widest mb-1">Puntos Acumulados</span>
-                                <span class="text-5xl font-black text-yellow-500" style="text-shadow: 1px 1px 0px #ca8a04;">${appState.points} pts</span>
-                            </div>
-                        </div>
-                        <div class="text-xs text-sky-700 font-bold bg-sky-100 px-4 py-2 rounded-xl border-2 border-sky-200">
-                            ID Participante: <span class="text-sky-600 font-black text-base ml-1">${appState.participantId}</span>
-                        </div>
-                    </div>
-
-                    <!-- 4 Indicators Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Indicator 1 -->
-                        <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
-                            <div>
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">Aproximación a la recompensa</h4>
-                                    <span class="text-2xl font-black text-yellow-500 bg-yellow-50 px-3 py-1 rounded-xl">${scores.anticipation} / 100</span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
-                                    <div class="bg-yellow-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.anticipation}%"></div>
-                                </div>
-                                <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Refleja las preferencias observadas ante alternativas con diferentes magnitudes y probabilidades de recompensa.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Indicator 2 -->
-                        <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
-                            <div>
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">Motivación y persistencia</h4>
-                                    <span class="text-2xl font-black text-green-500 bg-green-50 px-3 py-1 rounded-xl">${scores.persistence} / 100</span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
-                                    <div class="bg-green-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.persistence}%"></div>
-                                </div>
-                                <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Refleja la disposición a invertir esfuerzo y mantener la participación en tareas asociadas a recompensas.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Indicator 3 -->
-                        <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
-                            <div>
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">Respuesta ante la recompensa</h4>
-                                    <span class="text-2xl font-black text-sky-500 bg-sky-50 px-3 py-1 rounded-xl">${scores.responsiveness} / 100</span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
-                                    <div class="bg-sky-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.responsiveness}%"></div>
-                                </div>
-                                <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Refleja los cambios conductuales observados después de obtener resultados gratificantes.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Indicator 4 -->
-                        <div class="bg-white p-6 rounded-3xl border-4 border-slate-100 flex flex-col justify-between shadow-sm">
-                            <div>
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-black text-slate-700 text-base">Búsqueda de nuevas oportunidades</h4>
-                                    <span class="text-2xl font-black text-purple-500 bg-purple-50 px-3 py-1 rounded-xl">${scores.novelty} / 100</span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden border-2 border-slate-200 mb-4 p-0.5">
-                                    <div class="bg-purple-400 h-full rounded-full transition-all duration-1000" style="width: ${scores.novelty}%"></div>
-                                </div>
-                                <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                                    Refleja la preferencia por explorar alternativas novedosas frente a opciones conocidas. Es un indicador complementario.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mandatory Disclaimer -->
-                    <div class="bg-slate-50 p-5 rounded-2xl border-2 border-slate-200 text-xs text-slate-600 font-medium leading-relaxed flex items-start gap-3">
-                        <i class="fa-solid fa-circle-info text-lg text-sky-500 mt-0.5"></i>
-                        <div>
-                            Las puntuaciones representan indicadores conductuales experimentales en una escala descriptiva de 0 a 100. No son percentiles, puntuaciones normativas ni resultados de una prueba psicométrica validada. Deben interpretarse de forma exploratoria y no tienen finalidad diagnóstica.
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4 border-t-2 border-amber-100">
-                        <button onclick="window.print()" class="btn-game px-6 py-4 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-black border-slate-400 rounded-2xl transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-print"></i> Imprimir o Guardar Informe (PDF)
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ==========================================
-        // PANEL DEL EVALUADOR
-        // ==========================================
-        function openAdminModal() {
-            AudioFX.playClick();
-            const modal = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
-            modal.classList.remove('hidden');
-
-            content.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 pb-4 border-b-2 border-slate-100">
-                        <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-2xl border-2 border-slate-200">
-                            <i class="fa-solid fa-user-lock"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-black text-slate-800">Panel del Evaluador</h3>
-                            <p class="text-sm font-medium text-slate-500">Contraseña predeterminada: 'admin'</p>
-                        </div>
-                    </div>
-
-                    <div class="pt-2">
-                        <input type="password" id="adminPassInput" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-bold focus:outline-none focus:border-sky-400 text-sm" placeholder="••••••••">
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-4">
-                        <button onclick="closeModal()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm rounded-xl transition">Cancelar</button>
-                        <button onclick="verifyAdminPass()" class="btn-game px-6 py-3 bg-sky-400 hover:bg-sky-300 text-sky-950 font-black text-sm border-sky-600 rounded-xl transition">Entrar</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function verifyAdminPass() {
-            const val = document.getElementById('adminPassInput').value;
-            if (val === ADMIN_PASSWORD) {
-                closeModal();
-                renderAdminDashboard();
-            } else {
-                alert("Contraseña incorrecta.");
-            }
-        }
-
-        function renderAdminDashboard() {
-            const allSessions = StorageManager.getAllSessions();
-            const container = document.getElementById('appContainer');
-
-            container.innerHTML = `
-                <div class="max-w-5xl w-full bg-white border-4 border-amber-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-slate-100 pb-6 gap-4">
-                        <div>
-                            <span class="text-xs font-black text-sky-500 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-xl">Zona Privada</span>
-                            <h2 class="text-3xl font-black text-slate-800 mt-2">Panel de Administración de Datos</h2>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button onclick="exportAllCSV()" class="btn-game px-4 py-3 bg-green-400 hover:bg-green-300 text-green-950 text-sm font-black border-green-600 rounded-xl transition flex items-center gap-2">
-                                <i class="fa-solid fa-file-csv"></i> Descargar Datos (CSV)
-                            </button>
-                            <button onclick="renderMap()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-bold rounded-xl border-2 border-slate-200 transition">
-                                <i class="fa-solid fa-xmark"></i> Salir
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                            <span class="text-xs text-slate-500 block font-bold uppercase">Sesiones Registradas</span>
-                            <span class="text-3xl font-black text-slate-700">${allSessions.length}</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                            <span class="text-xs text-slate-500 block font-bold uppercase">Completadas</span>
-                            <span class="text-3xl font-black text-green-500">${allSessions.filter(s => s.completedPhases.every(Boolean)).length}</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                            <span class="text-xs text-slate-500 block font-bold uppercase">Puntos Medios</span>
-                            <span class="text-3xl font-black text-yellow-500">${allSessions.length ? Math.round(allSessions.reduce((a,b)=>a+(b.points||0),0)/allSessions.length) : 0}</span>
-                        </div>
-                        <div class="bg-sky-50 p-4 rounded-2xl border-2 border-sky-200">
-                            <span class="text-xs text-sky-600 block font-bold uppercase">Sesión Actual</span>
-                            <span class="text-sm font-black text-sky-700 truncate block mt-1">${appState.participantId}</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl border-4 border-slate-100 overflow-hidden shadow-sm">
-                        <div class="p-4 bg-slate-50 border-b-2 border-slate-200 flex justify-between items-center">
-                            <h4 class="font-black text-slate-700 text-sm uppercase">Registros Individuales</h4>
-                            <button onclick="clearSystemData()" class="text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100">Borrar Base de Datos</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-white text-slate-400 border-b-2 border-slate-100 uppercase font-black text-xs">
-                                    <tr>
-                                        <th class="p-4">ID Anónimo</th>
-                                        <th class="p-4">Fecha/Hora</th>
-                                        <th class="p-4">Fases</th>
-                                        <th class="p-4">Puntos</th>
-                                        <th class="p-4">Indicadores (1|2|3|4)</th>
-                                        <th class="p-4 text-right">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y-2 divide-slate-50 text-slate-600 font-medium">
-                                    ${allSessions.length === 0 ? `
-                                        <tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">No existen registros en el sistema.</td></tr>
-                                    ` : allSessions.map(s => {
-                                        const ind = calculateIndicators(s);
-                                        return `
-                                            <tr class="hover:bg-slate-50 transition">
-                                                <td class="p-4 font-black text-sky-600">${s.participantId}</td>
-                                                <td class="p-4 text-slate-500 text-xs font-bold">${new Date(s.startTime).toLocaleTimeString()}</td>
-                                                <td class="p-4"><span class="px-2 py-1 rounded-lg bg-green-50 text-green-600 font-black border border-green-200">${s.completedPhases.filter(Boolean).length}/4</span></td>
-                                                <td class="p-4 font-black text-yellow-500">${s.points}</td>
-                                                <td class="p-4 font-black text-slate-400 bg-slate-50 rounded-lg">${ind.anticipation} | ${ind.persistence} | ${ind.responsiveness} | ${ind.novelty}</td>
-                                                <td class="p-4 text-right">
-                                                    <button onclick="inspectSession('${s.participantId}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold border border-slate-300">
-                                                        Ver Logs
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function inspectSession(partId) {
-            const all = StorageManager.getAllSessions();
-            const session = all.find(s => s.participantId === partId);
-            if (!session) return;
-
-            const modal = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
-            modal.classList.remove('hidden');
-
-            content.innerHTML = `
-                <div class="space-y-4 max-h-[80vh] overflow-y-auto p-2">
-                    <div class="flex justify-between items-center border-b-2 border-slate-100 pb-3">
-                        <h3 class="text-xl font-black text-sky-600">Registro: ${session.participantId}</h3>
-                        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 bg-slate-100 p-2 rounded-full"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-
-                    <div class="text-sm text-slate-600 font-medium space-y-2 bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                        <p><strong class="text-slate-700">Inicio:</strong> ${session.startTime}</p>
-                        <p><strong class="text-slate-700">Fin:</strong> ${session.endTime || 'En curso'}</p>
-                        <p><strong class="text-slate-700">Puntos Totales:</strong> <span class="text-yellow-600 font-black">${session.points}</span></p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 1 (Aproximación):</span>
-                        <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase1, null, 2)}</pre>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 2 (Motivación y Esfuerzo):</span>
-                        <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase2, null, 2)}</pre>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 3 (Respuesta ante Recompensa):</span>
-                        <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase3, null, 2)}</pre>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 text-xs">
-                        <span class="text-slate-800 font-black uppercase tracking-widest block mb-2">Fase 4 (Búsqueda Novedad):</span>
-                        <pre class="text-slate-500 font-medium overflow-x-auto bg-slate-50 p-2 rounded-xl border border-slate-100">${JSON.stringify(session.responses.phase4, null, 2)}</pre>
-                    </div>
-                </div>
-            `;
-        }
-
-        function exportAllCSV() {
-            const sessions = StorageManager.getAllSessions();
-            if(!sessions.length) {
-                alert("No existen datos registados para exportar.");
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.replace('bg-orange-500', 'bg-brand-red');
+                }, 2000);
                 return;
             }
 
-            let csv = "ParticipantID,StartTime,EndTime,Points,P1_Anticipation,P2_Persistence,P3_Responsiveness,P4_Novelty\n";
-            sessions.forEach(s => {
-                const ind = calculateIndicators(s);
-                csv += `"${s.participantId}","${s.startTime}","${s.endTime || ''}",${s.points},${ind.anticipation},${ind.persistence},${ind.responsiveness},${ind.novelty}\n`;
-            });
+            // Set output text (use fallback text if empty)
+            document.getElementById('out-q1').innerText = q1 || "No se ha especificado ningún objetivo.";
+            document.getElementById('out-q2').innerText = q2 || "No se ha especificado ninguna actividad.";
+            document.getElementById('out-q3').innerText = q3 || "No se ha especificado método de comprobación.";
+            document.getElementById('out-q4').innerText = q4 || "No hay takeaway definido.";
 
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `REWARD_ISLAND_DATA_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-        }
+            // Show container with animation
+            const container = document.getElementById('resumenContainer');
+            container.classList.remove('hidden');
+            container.classList.add('fade-in');
 
-        function clearSystemData() {
-            if (confirm("¿Confirmas que deseas borrar permanentemente todos los registros del navegador?")) {
-                StorageManager.clearAllData();
-                renderAdminDashboard();
-            }
+            // Scroll to the generated plan smoothly
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     </script>
 </body>
