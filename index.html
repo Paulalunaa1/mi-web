@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Lab - Diseñador de Sesión</title>
+    <title>Writing Lab: Contenido + Relevancia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -15,9 +15,9 @@
                     },
                     colors: {
                         brand: {
-                            red: '#e74c3c',       /* Rojo suave para títulos */
-                            pinkBg: '#fef2f2',    /* Fondo rosa muy claro */
-                            purple: '#6366f1',    /* Morado para subtítulos */
+                            red: '#e74c3c',
+                            pinkBg: '#fdf2f8',    /* Rosa suave */
+                            purple: '#8b5cf6',    /* Morado */
                             purpleBg: '#f5f3ff',  /* Fondo morado muy claro */
                         }
                     }
@@ -27,27 +27,32 @@
     </script>
     <style>
         body {
-            background-color: #f8fafc;
+            background-color: #fafafa;
             color: #334155;
         }
-        /* Custom scrollbar for textareas */
-        textarea::-webkit-scrollbar {
-            width: 8px;
+        .sentence {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            padding: 0.15rem 0.25rem;
+            margin: 0 -0.25rem;
+            border-radius: 0.25rem;
+            display: inline;
+            line-height: 1.8;
         }
-        textarea::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-            border-radius: 4px;
+        .sentence:hover:not(.crossed) {
+            background-color: #f1f5f9; /* gris muy claro al pasar el ratón */
         }
-        textarea::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
+        .sentence.crossed {
+            text-decoration: line-through;
+            color: #94a3b8; /* gris claro para el texto tachado */
+            background-color: #f8fafc;
         }
-        textarea::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
+        .sentence.crossed:hover {
+            background-color: #e2e8f0;
         }
         
         .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out forwards;
         }
         
         @keyframes fadeIn {
@@ -56,222 +61,197 @@
         }
     </style>
 </head>
-<body class="antialiased min-h-screen p-4 md:p-8">
+<body class="antialiased min-h-screen p-4 md:p-8 flex justify-center">
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-4xl w-full">
         
-        <!-- Header -->
-        <header class="mb-8 text-center md:text-left border-b border-gray-200 pb-4">
-            <h1 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Tema 5</h1>
-            <h2 class="text-3xl font-bold text-brand-red">WRITING LAB</h2>
+        <!-- Cabecera -->
+        <header class="mb-8 text-center border-b border-gray-200 pb-6">
+            <h1 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Laboratorio de Escritura</h1>
+            <h2 class="text-3xl md:text-4xl font-bold text-brand-purple">Contenido + Relevancia</h2>
         </header>
 
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Panel de Teoría -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+            <div class="flex items-start gap-4">
+                <div class="bg-brand-purpleBg p-3 rounded-full text-brand-purple hidden sm:block">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Principios Básicos</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-gray-600 text-sm">
+                        <li><strong>Más información no significa mejor comunicación.</strong></li>
+                        <li>Cada dato debe contribuir a comprender el mensaje, tomar una decisión o completar una tarea.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contexto del Ejercicio -->
+        <section class="bg-brand-purpleBg border border-indigo-100 rounded-xl p-6 mb-6">
+            <h3 class="text-md font-bold text-brand-purple mb-3 uppercase tracking-wide text-sm">Contexto de tu mensaje</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
+                    <strong class="block text-gray-700 text-sm mb-1">🎯 Propósito:</strong>
+                    <p class="text-sm text-gray-600">Informar al equipo de un cambio de horario en una reunión y pedirles que traigan un documento.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
+                    <strong class="block text-gray-700 text-sm mb-1">👥 Audiencia:</strong>
+                    <p class="text-sm text-gray-600">Compañeros de equipo que están muy ocupados y leen correos rápido.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ejercicio Interactivo -->
+        <section class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-8">
+            <div class="bg-gray-50 border-b border-gray-200 p-4">
+                <h3 class="font-bold text-gray-800">Ejercicio Práctico</h3>
+                <p class="text-sm text-gray-500 mt-1"><strong>Instrucciones:</strong> Haz clic en las oraciones que consideres <span class="text-brand-red font-semibold">irrelevantes</span> para tacharlas y eliminarlas del mensaje final. Deja solo la información esencial.</p>
+            </div>
             
-            <!-- Left Column: Guía de la Sesión (1/3 width on desktop) -->
-            <aside class="lg:col-span-4 space-y-6">
-                
-                <!-- Section 1: Reglas -->
-                <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-brand-red mb-4">1. Cómo funciona la sesión</h3>
-                        
-                        <div class="bg-brand-pinkBg border-l-4 border-red-300 p-4 mb-5 rounded-r-lg text-sm text-red-900">
-                            <strong class="block text-brand-red mb-1">NO ES UNA PRESENTACIÓN</strong>
-                            Vuestro objetivo no es explicar diapositivas. Debéis conseguir que vuestros compañeros lo practiquen y se lleven una idea clara.
-                        </div>
-
-                        <h4 class="font-semibold text-gray-800 mb-2">Requisitos de vuestra experiencia</h4>
-                        <ul class="space-y-2 text-sm text-gray-600 list-disc pl-5">
-                            <li><span class="font-medium">Máximo 5 minutos.</span></li>
-                            <li>La explicación teórica debe ser muy breve.</li>
-                            <li><span class="font-medium text-brand-red">Los compañeros deben participar activamente.</span></li>
-                            <li>Deben pensar, decidir, crear, comparar, reescribir o resolver algo.</li>
-                            <li>La actividad debe terminar con una idea clave o takeaway.</li>
-                        </ul>
-                    </div>
-                </section>
-
-                <!-- Section 2: Marco Común -->
-                <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-brand-red mb-4">2. Marco común</h3>
-                        
-                        <div class="space-y-4">
-                            <!-- Antes de escribir -->
-                            <div class="bg-brand-purpleBg p-4 rounded-lg">
-                                <h4 class="font-bold text-brand-purple text-sm mb-1 uppercase">Antes de escribir</h4>
-                                <p class="text-xs font-medium text-gray-700 tracking-wide">
-                                    PROPÓSITO + AUDIENCIA &rarr; CONTENIDO &middot; ESTRUCTURA &middot; ESTILO
-                                </p>
-                            </div>
-                            <p class="text-xs text-gray-500 italic">Escribir bien empieza antes de escribir: primero decides para quién escribes y qué quieres conseguir; después eliges qué decir, cómo organizarlo y cómo expresarlo.</p>
-                            
-                            <!-- Proceso de escritura -->
-                            <div class="bg-brand-purpleBg p-4 rounded-lg">
-                                <h4 class="font-bold text-brand-purple text-sm mb-1 uppercase">Proceso de escritura</h4>
-                                <p class="text-xs font-medium text-gray-700 tracking-wide">
-                                    PLAN &rarr; DRAFT &rarr; REVISE &rarr; PROOFREAD
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </aside>
-
-            <!-- Right Column: Diseñador de Experiencia (2/3 width on desktop) -->
-            <section class="lg:col-span-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
-                
-                <div class="mb-2">
-                    <span class="text-xs font-bold text-brand-red uppercase tracking-widest">Categoría 2</span>
+            <div class="p-6 md:p-8">
+                <!-- Contenedor del texto interactivo -->
+                <div id="email-text" class="text-lg text-gray-800 font-medium">
+                    <!-- Las oraciones se insertarán aquí con JavaScript -->
                 </div>
-                <h2 class="text-3xl font-bold text-brand-red mb-2">Contenido + relevancia</h2>
-                <h3 class="text-lg font-medium text-brand-purple mb-6">Elegir qué información merece estar en el texto.</h3>
-                
-                <!-- Objetivo Alert -->
-                <div class="bg-brand-purpleBg border-l-4 border-indigo-300 p-4 mb-8 rounded-r-lg">
-                    <strong class="block text-brand-purple text-sm uppercase mb-1">Objetivo</strong>
-                    <p class="text-sm text-gray-700">Ser capaces de seleccionar información relevante y eliminar contenido innecesario.</p>
-                </div>
+            </div>
+            
+            <div class="bg-gray-50 border-t border-gray-200 p-4 flex justify-end">
+                <button id="btn-evaluar" onclick="evaluarEjercicio()" class="bg-brand-purple hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">
+                    Evaluar mi texto
+                </button>
+            </div>
+        </section>
 
-                <!-- Recordatorio Desplegable -->
-                <details class="mb-8 group border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-                    <summary class="font-semibold text-gray-700 p-4 cursor-pointer hover:bg-gray-100 transition-colors list-none flex justify-between items-center">
-                        <span>💡 Preguntas clave que debéis poder responder</span>
-                        <span class="transition group-open:rotate-180">
-                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                        </span>
-                    </summary>
-                    <div class="p-4 pt-0 text-sm text-gray-600 bg-gray-50 border-t border-gray-200">
-                        <ul class="list-disc pl-5 mt-3 space-y-2">
-                            <li>¿Qué necesita saber <strong>realmente</strong> el lector?</li>
-                            <li>¿Qué información es <strong>esencial</strong>?</li>
-                            <li>¿Qué información distrae o sobrecarga?</li>
-                            <li>¿Hay datos correctos pero irrelevantes?</li>
-                            <li>¿Podría eliminar algo sin perder el mensaje?</li>
-                        </ul>
-                    </div>
-                </details>
+        <!-- Panel de Resultados (Oculto por defecto) -->
+        <section id="panel-resultados" class="hidden bg-white rounded-xl shadow-lg border-2 border-brand-purple p-6 md:p-8 text-center relative overflow-hidden">
+            <div id="resultado-icono" class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4">
+                <!-- Icono insertado por JS -->
+            </div>
+            <h3 id="resultado-titulo" class="text-2xl font-bold mb-2"></h3>
+            <p id="resultado-mensaje" class="text-gray-600 mb-6"></p>
 
-                <!-- Formulario -->
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Diseño de vuestra experiencia</h3>
-                <p class="text-sm text-gray-500 mb-6">Completad los siguientes apartados para estructurar vuestra dinámica de 5 minutos.</p>
-                
-                <form id="planForm" class="space-y-6">
-                    
-                    <div class="flex flex-col">
-                        <label for="q1" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
-                            ¿Qué queréis que aprendan en 5 minutos?
-                        </label>
-                        <textarea id="q1" rows="3" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Que más información no significa mejor comunicación..."></textarea>
-                    </div>
+            <div class="bg-brand-pinkBg border border-pink-200 p-5 rounded-lg text-left inline-block w-full">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-red mb-2">⭐ Takeaway</h4>
+                <p class="text-md font-medium text-gray-800 italic">Antes de enviar, pregúntate siempre: ¿Qué necesita saber realmente el lector? ¿Qué información distrae o sobrecarga?</p>
+            </div>
+            
+            <button onclick="reiniciarEjercicio()" class="mt-6 text-sm text-brand-purple font-semibold hover:underline">
+                Volver a intentar
+            </button>
+        </section>
 
-                    <div class="flex flex-col">
-                        <label for="q2" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
-                            ¿Qué tendrán que <span class="uppercase text-brand-red">HACER</span> para practicarlo?
-                        </label>
-                        <textarea id="q2" rows="3" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Leer un correo electrónico largo y tachar las frases irrelevantes..."></textarea>
-                    </div>
-
-                    <div class="flex flex-col">
-                        <label for="q3" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
-                            ¿Cómo comprobaréis que lo han entendido?
-                        </label>
-                        <textarea id="q3" rows="3" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Pediremos a dos parejas que compartan qué eliminaron y por qué..."></textarea>
-                    </div>
-
-                    <div class="flex flex-col">
-                        <label for="q4" class="text-sm font-semibold text-gray-700 mb-2 bg-gray-100 py-2 px-3 rounded-t-md border border-gray-200 border-b-0">
-                            Takeaway: una idea que deben recordar
-                        </label>
-                        <textarea id="q4" rows="2" class="w-full p-3 border border-gray-200 rounded-b-md focus:ring-2 focus:ring-brand-purple focus:border-transparent outline-none resize-y transition-shadow" placeholder="Ej: Ante la duda, si no ayuda a decidir o entender, bórralo."></textarea>
-                    </div>
-
-                    <div class="pt-4 text-right">
-                        <button type="button" onclick="generarPlan()" class="bg-brand-red hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 w-full sm:w-auto">
-                            Generar Plan de Sesión
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Output Area (Hidden by default) -->
-                <div id="resumenContainer" class="hidden mt-10 pt-8 border-t-2 border-dashed border-gray-200">
-                    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 print:shadow-none print:border-none">
-                        
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-2xl font-bold text-gray-800">Plan de Sesión: Contenido + Relevancia</h3>
-                            <button onclick="window.print()" class="text-gray-500 hover:text-brand-purple p-2 rounded-full hover:bg-brand-purpleBg transition-colors" title="Imprimir o guardar como PDF">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-purple mb-1">Objetivo de aprendizaje (5 min)</h4>
-                                <p id="out-q1" class="text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-brand-purple"></p>
-                            </div>
-                            
-                            <div>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-red mb-1">Actividad práctica</h4>
-                                <p id="out-q2" class="text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-brand-red"></p>
-                            </div>
-
-                            <div>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-500 mb-1">Comprobación del aprendizaje</h4>
-                                <p id="out-q3" class="text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-indigo-400"></p>
-                            </div>
-
-                            <div class="bg-brand-pinkBg p-5 rounded-lg text-center mt-6">
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-red mb-2">⭐ Takeaway Principal</h4>
-                                <p id="out-q4" class="text-lg font-medium text-gray-800 italic"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-        </main>
     </div>
 
     <script>
-        function generarPlan() {
-            // Get values from textareas
-            const q1 = document.getElementById('q1').value.trim();
-            const q2 = document.getElementById('q2').value.trim();
-            const q3 = document.getElementById('q3').value.trim();
-            const q4 = document.getElementById('q4').value.trim();
+        // Datos de las oraciones
+        const oraciones = [
+            { id: 1, texto: "Hola a todos, ", esencial: true, tachada: false },
+            { id: 2, texto: "Quería escribiros este email porque sé que los lunes siempre son un poco caóticos para todos en la oficina y cuesta arrancar. ", esencial: false, tachada: false },
+            { id: 3, texto: "La reunión de estado del proyecto se retrasa a las 11:30 de la mañana. ", esencial: true, tachada: false },
+            { id: 4, texto: "Inicialmente iba a ser a las 10:00, pero he tenido un problema con el coche al venir, el mecánico me ha dicho que es la batería y luego el tráfico estaba fatal. ", esencial: false, tachada: false },
+            { id: 5, texto: "Por favor, traed el informe de métricas impreso. ", esencial: true, tachada: false },
+            { id: 6, texto: "A mí la impresora de mi planta me está dando muchos problemas últimamente, creo que le falta tóner. ", esencial: false, tachada: false },
+            { id: 7, texto: "Nos vemos en la sala de reuniones 3. ", esencial: true, tachada: false },
+            { id: 8, texto: "Un saludo.", esencial: true, tachada: false }
+        ];
 
-            // Validation (optional, but good UX)
-            if(!q1 && !q2 && !q3 && !q4) {
-                // Flash an alert cleanly in the UI instead of window.alert
-                const btn = document.querySelector('button[type="button"]');
-                const originalText = btn.innerText;
-                btn.innerText = "¡Por favor, rellena algún campo!";
-                btn.classList.replace('bg-brand-red', 'bg-orange-500');
+        // Función para renderizar el texto
+        function renderizarTexto() {
+            const contenedor = document.getElementById('email-text');
+            contenedor.innerHTML = ''; // Limpiar
+
+            oraciones.forEach(oracion => {
+                const span = document.createElement('span');
+                span.innerText = oracion.texto;
+                span.className = `sentence ${oracion.tachada ? 'crossed' : ''}`;
                 
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.classList.replace('bg-orange-500', 'bg-brand-red');
-                }, 2000);
-                return;
+                // Evento de clic para tachar/destachar
+                span.onclick = () => toggleTachar(oracion.id);
+                
+                contenedor.appendChild(span);
+            });
+        }
+
+        // Función para cambiar el estado de una oración
+        function toggleTachar(id) {
+            const oracion = oraciones.find(o => o.id === id);
+            if (oracion) {
+                oracion.tachada = !oracion.tachada;
+                renderizarTexto(); // Volver a dibujar
+                
+                // Ocultar resultados si se hace un cambio
+                document.getElementById('panel-resultados').classList.add('hidden');
+                document.getElementById('panel-resultados').classList.remove('fade-in');
+            }
+        }
+
+        // Función para evaluar el ejercicio
+        function evaluarEjercicio() {
+            let aciertos = 0;
+            let errores = 0;
+            let tachadasInnecesarias = 0; // Tachó algo que era esencial
+
+            oraciones.forEach(oracion => {
+                if (!oracion.esencial && oracion.tachada) aciertos++;
+                if (!oracion.esencial && !oracion.tachada) errores++;
+                if (oracion.esencial && oracion.tachada) tachadasInnecesarias++;
+            });
+
+            const totalNoEsenciales = oraciones.filter(o => !o.esencial).length;
+            
+            const panel = document.getElementById('panel-resultados');
+            const iconoCont = document.getElementById('resultado-icono');
+            const titulo = document.getElementById('resultado-titulo');
+            const mensaje = document.getElementById('resultado-mensaje');
+
+            // Lógica de evaluación
+            if (aciertos === totalNoEsenciales && tachadasInnecesarias === 0) {
+                // Éxito perfecto
+                iconoCont.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 bg-green-100 text-green-600";
+                iconoCont.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+                titulo.innerText = "¡Excelente trabajo!";
+                titulo.className = "text-2xl font-bold mb-2 text-green-600";
+                mensaje.innerText = "Has eliminado toda la información irrelevante sin perder los datos esenciales del mensaje. Tu correo ahora es directo y respeta el tiempo de tu audiencia.";
+            } else if (tachadasInnecesarias > 0) {
+                // Borró información esencial
+                iconoCont.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 bg-red-100 text-red-600";
+                iconoCont.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+                titulo.innerText = "¡Cuidado!";
+                titulo.className = "text-2xl font-bold mb-2 text-brand-red";
+                mensaje.innerText = "Has eliminado información que era esencial para que el lector entendiera el mensaje o completara la tarea (como la hora o lo que deben llevar). Revisa el texto.";
+            } else {
+                // Le faltó borrar algo
+                iconoCont.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 bg-yellow-100 text-yellow-600";
+                iconoCont.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                titulo.innerText = "Casi lo tienes";
+                titulo.className = "text-2xl font-bold mb-2 text-yellow-600";
+                mensaje.innerText = "Aún quedan detalles en el texto que no aportan valor para el propósito del correo y solo añaden 'ruido'. Intenta eliminar las excusas o anécdotas personales.";
             }
 
-            // Set output text (use fallback text if empty)
-            document.getElementById('out-q1').innerText = q1 || "No se ha especificado ningún objetivo.";
-            document.getElementById('out-q2').innerText = q2 || "No se ha especificado ninguna actividad.";
-            document.getElementById('out-q3').innerText = q3 || "No se ha especificado método de comprobación.";
-            document.getElementById('out-q4').innerText = q4 || "No hay takeaway definido.";
-
-            // Show container with animation
-            const container = document.getElementById('resumenContainer');
-            container.classList.remove('hidden');
-            container.classList.add('fade-in');
-
-            // Scroll to the generated plan smoothly
-            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Mostrar el panel con animación
+            panel.classList.remove('hidden');
+            panel.classList.add('fade-in');
+            
+            // Scroll hacia el resultado
+            setTimeout(() => {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
+
+        function reiniciarEjercicio() {
+            oraciones.forEach(o => o.tachada = false);
+            renderizarTexto();
+            document.getElementById('panel-resultados').classList.add('hidden');
+            document.getElementById('panel-resultados').classList.remove('fade-in');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Inicializar al cargar
+        window.onload = renderizarTexto;
+
     </script>
 </body>
 </html>
