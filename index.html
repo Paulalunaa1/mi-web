@@ -3,255 +3,402 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Lab: Contenido + Relevancia</title>
+    <title>NeuroQuiz - Estilo Kahoot</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            red: '#e74c3c',
-                            pinkBg: '#fdf2f8',    /* Rosa suave */
-                            purple: '#8b5cf6',    /* Morado */
-                            purpleBg: '#f5f3ff',  /* Fondo morado muy claro */
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #fafafa;
-            color: #334155;
-        }
-        .sentence {
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            padding: 0.15rem 0.25rem;
-            margin: 0 -0.25rem;
-            border-radius: 0.25rem;
-            display: inline;
-            line-height: 1.8;
-        }
-        .sentence:hover:not(.crossed) {
-            background-color: #f1f5f9; /* gris muy claro al pasar el ratón */
-        }
-        .sentence.crossed {
-            text-decoration: line-through;
-            color: #94a3b8; /* gris claro para el texto tachado */
-            background-color: #f8fafc;
-        }
-        .sentence.crossed:hover {
-            background-color: #e2e8f0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f2f2f2;
+            overflow-x: hidden;
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out forwards;
+        .kahoot-bg {
+            background-image: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="%23f2f2f2"/><circle cx="10%" cy="20%" r="50" fill="%23e21b3c" opacity="0.1"/><rect x="80%" y="70%" width="80" height="80" fill="%231368ce" opacity="0.1" transform="rotate(45 80 80)"/><polygon points="100,20 120,60 80,60" fill="%23d89e00" opacity="0.1" transform="translate(600, 100)"/><rect x="20%" y="80%" width="60" height="60" fill="%2326890c" opacity="0.1"/></svg>');
+            background-size: cover;
+        }
+
+        .btn-red { background-color: #e21b3c; box-shadow: 0 4px 0 #b0152e; }
+        .btn-blue { background-color: #1368ce; box-shadow: 0 4px 0 #0f52a3; }
+        .btn-yellow { background-color: #d89e00; box-shadow: 0 4px 0 #a87b00; }
+        .btn-green { background-color: #26890c; box-shadow: 0 4px 0 #1d6b09; }
+        
+        .btn-red:active, .btn-blue:active, .btn-yellow:active, .btn-green:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 transparent;
+        }
+
+        .shape-icon {
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3));
+        }
+
+        /* Timer Bar Animation */
+        #timer-bar {
+            transition: width 1s linear, background-color 0.3s;
+        }
+
+        /* Animations */
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: pop 0.4s ease-out forwards;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
         }
     </style>
 </head>
-<body class="antialiased min-h-screen p-4 md:p-8 flex justify-center">
+<body class="kahoot-bg h-screen flex flex-col items-center justify-center text-gray-800">
 
-    <div class="max-w-4xl w-full">
-        
-        <!-- Cabecera -->
-        <header class="mb-8 text-center border-b border-gray-200 pb-6">
-            <h1 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Laboratorio de Escritura</h1>
-            <h2 class="text-3xl md:text-4xl font-bold text-brand-purple">Contenido + Relevancia</h2>
-        </header>
+    <!-- HEADER / TOP BAR -->
+    <header class="fixed top-0 left-0 w-full p-4 flex justify-between items-center bg-white shadow-md z-10">
+        <div class="font-bold text-2xl text-purple-700 tracking-tighter">Neuro<span class="text-yellow-500">Quiz</span></div>
+        <div id="score-display" class="hidden font-bold text-xl bg-gray-100 px-4 py-1 rounded-full border-2 border-gray-200">
+            0 Pts
+        </div>
+    </header>
 
-        <!-- Panel de Teoría -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-            <div class="flex items-start gap-4">
-                <div class="bg-brand-purpleBg p-3 rounded-full text-brand-purple hidden sm:block">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Principios Básicos</h3>
-                    <ul class="list-disc pl-5 space-y-1 text-gray-600 text-sm">
-                        <li><strong>Más información no significa mejor comunicación.</strong></li>
-                        <li>Cada dato debe contribuir a comprender el mensaje, tomar una decisión o completar una tarea.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contexto del Ejercicio -->
-        <section class="bg-brand-purpleBg border border-indigo-100 rounded-xl p-6 mb-6">
-            <h3 class="text-md font-bold text-brand-purple mb-3 uppercase tracking-wide text-sm">Contexto de tu mensaje</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
-                    <strong class="block text-gray-700 text-sm mb-1">🎯 Propósito:</strong>
-                    <p class="text-sm text-gray-600">Informar al equipo de un cambio de horario en una reunión y pedirles que traigan un documento.</p>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
-                    <strong class="block text-gray-700 text-sm mb-1">👥 Audiencia:</strong>
-                    <p class="text-sm text-gray-600">Compañeros de equipo que están muy ocupados y leen correos rápido.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Ejercicio Interactivo -->
-        <section class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-8">
-            <div class="bg-gray-50 border-b border-gray-200 p-4">
-                <h3 class="font-bold text-gray-800">Ejercicio Práctico</h3>
-                <p class="text-sm text-gray-500 mt-1"><strong>Instrucciones:</strong> Haz clic en las oraciones que consideres <span class="text-brand-red font-semibold">irrelevantes</span> para tacharlas y eliminarlas del mensaje final. Deja solo la información esencial.</p>
-            </div>
-            
-            <div class="p-6 md:p-8">
-                <!-- Contenedor del texto interactivo -->
-                <div id="email-text" class="text-lg text-gray-800 font-medium">
-                    <!-- Las oraciones se insertarán aquí con JavaScript -->
-                </div>
-            </div>
-            
-            <div class="bg-gray-50 border-t border-gray-200 p-4 flex justify-end">
-                <button id="btn-evaluar" onclick="evaluarEjercicio()" class="bg-brand-purple hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors">
-                    Evaluar mi texto
-                </button>
-            </div>
-        </section>
-
-        <!-- Panel de Resultados (Oculto por defecto) -->
-        <section id="panel-resultados" class="hidden bg-white rounded-xl shadow-lg border-2 border-brand-purple p-6 md:p-8 text-center relative overflow-hidden">
-            <div id="resultado-icono" class="mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4">
-                <!-- Icono insertado por JS -->
-            </div>
-            <h3 id="resultado-titulo" class="text-2xl font-bold mb-2"></h3>
-            <p id="resultado-mensaje" class="text-gray-600 mb-6"></p>
-
-            <div class="bg-brand-pinkBg border border-pink-200 p-5 rounded-lg text-left inline-block w-full">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-brand-red mb-2">⭐ Takeaway</h4>
-                <p class="text-md font-medium text-gray-800 italic">Antes de enviar, pregúntate siempre: ¿Qué necesita saber realmente el lector? ¿Qué información distrae o sobrecarga?</p>
-            </div>
-            
-            <button onclick="reiniciarEjercicio()" class="mt-6 text-sm text-brand-purple font-semibold hover:underline">
-                Volver a intentar
+    <!-- START SCREEN -->
+    <div id="start-screen" class="w-full max-w-2xl px-4 flex flex-col items-center animate-pop text-center mt-12">
+        <div class="bg-white p-8 rounded-xl shadow-lg border-2 border-gray-100 w-full">
+            <h1 class="text-4xl font-extrabold mb-4 text-gray-800">Cuestionario de Funciones Cerebrales</h1>
+            <p class="text-gray-600 mb-8 font-semibold">Basado en apuntes de neuroanatomía (Sistema olfatorio, recompensa, amígdala, hipotálamo y circuito de Papez).</p>
+            <button onclick="startGame()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-2xl py-4 px-12 rounded-lg transition-transform transform hover:scale-105 shadow-[0_6px_0_#4c1d95] active:translate-y-[6px] active:shadow-none w-full md:w-auto">
+                ¡Empezar!
             </button>
-        </section>
-
+        </div>
     </div>
 
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="hidden w-full h-full flex flex-col mt-16 px-4 pb-4 max-w-5xl mx-auto">
+        
+        <!-- Timer -->
+        <div class="w-full h-4 bg-gray-300 rounded-full mb-6 overflow-hidden mt-4 shadow-inner">
+            <div id="timer-bar" class="h-full bg-purple-500 w-full rounded-full"></div>
+        </div>
+
+        <!-- Question Container -->
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-lg border-2 border-gray-100 mb-6 flex-grow flex items-center justify-center animate-pop">
+            <h2 id="question-text" class="text-2xl md:text-4xl font-bold text-center leading-tight">
+                <!-- Question goes here -->
+            </h2>
+        </div>
+
+        <!-- Answers Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-auto md:h-64">
+            <!-- Option 0 (Red / Triangle) -->
+            <button onclick="selectOption(0)" class="btn-red text-white text-left font-bold text-lg md:text-2xl p-4 md:p-6 rounded-lg flex items-center relative overflow-hidden group hover:brightness-110 transition-all">
+                <div class="shape-icon mr-4 w-8 h-8 md:w-12 md:h-12 flex-shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" fill="white"><polygon points="50,10 90,90 10,90"/></svg>
+                </div>
+                <span id="option-0-text" class="flex-grow drop-shadow-md z-10 leading-tight"></span>
+            </button>
+            
+            <!-- Option 1 (Blue / Diamond) -->
+            <button onclick="selectOption(1)" class="btn-blue text-white text-left font-bold text-lg md:text-2xl p-4 md:p-6 rounded-lg flex items-center relative overflow-hidden group hover:brightness-110 transition-all">
+                <div class="shape-icon mr-4 w-8 h-8 md:w-12 md:h-12 flex-shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" fill="white"><polygon points="50,10 90,50 50,90 10,50"/></svg>
+                </div>
+                <span id="option-1-text" class="flex-grow drop-shadow-md z-10 leading-tight"></span>
+            </button>
+            
+            <!-- Option 2 (Yellow / Circle) -->
+            <button onclick="selectOption(2)" class="btn-yellow text-white text-left font-bold text-lg md:text-2xl p-4 md:p-6 rounded-lg flex items-center relative overflow-hidden group hover:brightness-110 transition-all">
+                <div class="shape-icon mr-4 w-8 h-8 md:w-12 md:h-12 flex-shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" fill="white"><circle cx="50" cy="50" r="40"/></svg>
+                </div>
+                <span id="option-2-text" class="flex-grow drop-shadow-md z-10 leading-tight"></span>
+            </button>
+            
+            <!-- Option 3 (Green / Square) -->
+            <button onclick="selectOption(3)" class="btn-green text-white text-left font-bold text-lg md:text-2xl p-4 md:p-6 rounded-lg flex items-center relative overflow-hidden group hover:brightness-110 transition-all">
+                <div class="shape-icon mr-4 w-8 h-8 md:w-12 md:h-12 flex-shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" fill="white"><rect x="15" y="15" width="70" height="70"/></svg>
+                </div>
+                <span id="option-3-text" class="flex-grow drop-shadow-md z-10 leading-tight"></span>
+            </button>
+        </div>
+        
+        <div class="text-center mt-4 text-gray-500 font-bold">
+            Pregunta <span id="current-q-num">1</span> de <span id="total-q-num">x</span>
+        </div>
+    </div>
+
+    <!-- FEEDBACK SCREEN -->
+    <div id="feedback-screen" class="hidden w-full h-full absolute top-0 left-0 z-20 flex flex-col items-center justify-center px-4">
+        <div id="feedback-bg" class="absolute inset-0 opacity-90 transition-colors duration-300"></div>
+        
+        <div class="relative z-30 text-center animate-pop">
+            <h1 id="feedback-title" class="text-5xl md:text-7xl font-extrabold text-white drop-shadow-lg mb-4">¡Correcto!</h1>
+            <div id="feedback-points" class="bg-black bg-opacity-30 rounded-full px-6 py-2 text-white font-bold text-2xl inline-block mb-8">
+                +1000
+            </div>
+            <p id="correct-answer-text" class="text-white text-xl md:text-2xl font-semibold bg-black bg-opacity-40 p-4 rounded-lg hidden mb-8 shadow-md"></p>
+            
+            <button onclick="nextQuestion()" class="block mx-auto bg-white text-gray-900 font-bold text-xl py-3 px-10 rounded-lg hover:bg-gray-100 transition-transform transform hover:scale-105 shadow-[0_4px_0_#d1d5db] active:translate-y-[4px] active:shadow-none">
+                Siguiente
+            </button>
+        </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" class="hidden w-full max-w-2xl px-4 flex flex-col items-center animate-pop text-center mt-12 z-30 relative">
+        <div class="bg-white p-8 md:p-12 rounded-xl shadow-2xl border-4 border-purple-500 w-full">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-2 text-purple-700">¡Juego Terminado!</h1>
+            <p class="text-gray-500 font-bold text-lg mb-8">Has completado el repaso.</p>
+            
+            <div class="bg-gray-100 p-6 rounded-lg mb-8 border-2 border-gray-200">
+                <p class="text-gray-600 font-semibold mb-2">Puntuación Final</p>
+                <p id="final-score" class="text-5xl md:text-6xl font-black text-gray-800">0</p>
+            </div>
+            
+            <button onclick="resetGame()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl py-4 px-10 rounded-lg transition-transform transform hover:scale-105 shadow-[0_5px_0_#1e3a8a] active:translate-y-[5px] active:shadow-none w-full sm:w-auto">
+                Volver a Jugar
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
     <script>
-        // Datos de las oraciones
-        const oraciones = [
-            { id: 1, texto: "Hola a todos, ", esencial: true, tachada: false },
-            { id: 2, texto: "Quería escribiros este email porque sé que los lunes siempre son un poco caóticos para todos en la oficina y cuesta arrancar. ", esencial: false, tachada: false },
-            { id: 3, texto: "La reunión de estado del proyecto se retrasa a las 11:30 de la mañana. ", esencial: true, tachada: false },
-            { id: 4, texto: "Inicialmente iba a ser a las 10:00, pero he tenido un problema con el coche al venir, el mecánico me ha dicho que es la batería y luego el tráfico estaba fatal. ", esencial: false, tachada: false },
-            { id: 5, texto: "Por favor, traed el informe de métricas impreso. ", esencial: true, tachada: false },
-            { id: 6, texto: "A mí la impresora de mi planta me está dando muchos problemas últimamente, creo que le falta tóner. ", esencial: false, tachada: false },
-            { id: 7, texto: "Nos vemos en la sala de reuniones 3. ", esencial: true, tachada: false },
-            { id: 8, texto: "Un saludo.", esencial: true, tachada: false }
+        // Game Data extracted from the provided slides
+        const questions = [
+            {
+                text: "¿Cuál es el único sistema sensorial que alcanza la corteza sin relevo talámico obligatorio?",
+                options: [
+                    "Sistema auditivo", 
+                    "Sistema somatosensorial", 
+                    "Sistema olfatorio", 
+                    "Sistema visual"
+                ],
+                correctIndex: 2
+            },
+            {
+                text: "La hiposmia es un signo precoz en enfermedades neurodegenerativas como:",
+                options: [
+                    "Parkinson y Alzheimer", 
+                    "Esquizofrenia", 
+                    "Esclerosis Múltiple", 
+                    "Síndrome de Klüver-Bucy"
+                ],
+                correctIndex: 0
+            },
+            {
+                text: "En la vía mesolímbica de recompensa, las neuronas proyectan desde el Área Tegmental Ventral (ATV) hacia:",
+                options: [
+                    "Corteza prefrontal", 
+                    "Núcleo accumbens, amígdala e hipocampo", 
+                    "Estriado dorsal", 
+                    "Hipófisis"
+                ],
+                correctIndex: 1
+            },
+            {
+                text: "En el condicionamiento clásico del miedo, ¿dónde adquiere valor aversivo un estímulo neutro?",
+                options: [
+                    "Hipotálamo posterior", 
+                    "Corteza prefrontal ventromedial", 
+                    "Hipocampo", 
+                    "Núcleo basolateral de la amígdala"
+                ],
+                correctIndex: 3
+            },
+            {
+                text: "¿Qué área del hipotálamo está asociada principalmente con el control de la saciedad?",
+                options: [
+                    "Hipotálamo ventromedial", 
+                    "Hipotálamo lateral", 
+                    "Hipotálamo anterior", 
+                    "Núcleo paraventricular"
+                ],
+                correctIndex: 0
+            },
+            {
+                text: "El circuito cerrado de Papez tiene como función principal consolidar:",
+                options: [
+                    "La memoria procedimental", 
+                    "La respuesta de lucha o huida", 
+                    "La memoria episódica", 
+                    "La memoria de trabajo"
+                ],
+                correctIndex: 2
+            }
         ];
 
-        // Función para renderizar el texto
-        function renderizarTexto() {
-            const contenedor = document.getElementById('email-text');
-            contenedor.innerHTML = ''; // Limpiar
+        // Game State
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeRemaining = 0;
+        const TIME_PER_QUESTION = 15; // seconds
+        let timerInterval;
+        let canAnswer = false;
 
-            oraciones.forEach(oracion => {
-                const span = document.createElement('span');
-                span.innerText = oracion.texto;
-                span.className = `sentence ${oracion.tachada ? 'crossed' : ''}`;
-                
-                // Evento de clic para tachar/destachar
-                span.onclick = () => toggleTachar(oracion.id);
-                
-                contenedor.appendChild(span);
-            });
+        // DOM Elements
+        const screens = {
+            start: document.getElementById('start-screen'),
+            game: document.getElementById('game-screen'),
+            feedback: document.getElementById('feedback-screen'),
+            end: document.getElementById('end-screen')
+        };
+        const scoreDisplay = document.getElementById('score-display');
+        const timerBar = document.getElementById('timer-bar');
+        const questionText = document.getElementById('question-text');
+        const qNumDisplay = document.getElementById('current-q-num');
+        const qTotalDisplay = document.getElementById('total-q-num');
+        
+        // Feedback elements
+        const feedbackBg = document.getElementById('feedback-bg');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackPoints = document.getElementById('feedback-points');
+        const correctAnswerText = document.getElementById('correct-answer-text');
+        
+        // Init Total
+        qTotalDisplay.textContent = questions.length;
+
+        function hideAllScreens() {
+            Object.values(screens).forEach(screen => screen.classList.add('hidden'));
         }
 
-        // Función para cambiar el estado de una oración
-        function toggleTachar(id) {
-            const oracion = oraciones.find(o => o.id === id);
-            if (oracion) {
-                oracion.tachada = !oracion.tachada;
-                renderizarTexto(); // Volver a dibujar
-                
-                // Ocultar resultados si se hace un cambio
-                document.getElementById('panel-resultados').classList.add('hidden');
-                document.getElementById('panel-resultados').classList.remove('fade-in');
-            }
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            updateScoreDisplay();
+            scoreDisplay.classList.remove('hidden');
+            showQuestion();
         }
 
-        // Función para evaluar el ejercicio
-        function evaluarEjercicio() {
-            let aciertos = 0;
-            let errores = 0;
-            let tachadasInnecesarias = 0; // Tachó algo que era esencial
+        function showQuestion() {
+            hideAllScreens();
+            screens.game.classList.remove('hidden');
+            screens.game.classList.remove('animate-pop');
+            void screens.game.offsetWidth; // trigger reflow
+            screens.game.classList.add('animate-pop');
 
-            oraciones.forEach(oracion => {
-                if (!oracion.esencial && oracion.tachada) aciertos++;
-                if (!oracion.esencial && !oracion.tachada) errores++;
-                if (oracion.esencial && oracion.tachada) tachadasInnecesarias++;
-            });
+            const currentQ = questions[currentQuestionIndex];
+            questionText.textContent = currentQ.text;
+            qNumDisplay.textContent = currentQuestionIndex + 1;
 
-            const totalNoEsenciales = oraciones.filter(o => !o.esencial).length;
-            
-            const panel = document.getElementById('panel-resultados');
-            const iconoCont = document.getElementById('resultado-icono');
-            const titulo = document.getElementById('resultado-titulo');
-            const mensaje = document.getElementById('resultado-mensaje');
-
-            // Lógica de evaluación
-            if (aciertos === totalNoEsenciales && tachadasInnecesarias === 0) {
-                // Éxito perfecto
-                iconoCont.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 bg-green-100 text-green-600";
-                iconoCont.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
-                titulo.innerText = "¡Excelente trabajo!";
-                titulo.className = "text-2xl font-bold mb-2 text-green-600";
-                mensaje.innerText = "Has eliminado toda la información irrelevante sin perder los datos esenciales del mensaje. Tu correo ahora es directo y respeta el tiempo de tu audiencia.";
-            } else if (tachadasInnecesarias > 0) {
-                // Borró información esencial
-                iconoCont.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 bg-red-100 text-red-600";
-                iconoCont.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
-                titulo.innerText = "¡Cuidado!";
-                titulo.className = "text-2xl font-bold mb-2 text-brand-red";
-                mensaje.innerText = "Has eliminado información que era esencial para que el lector entendiera el mensaje o completara la tarea (como la hora o lo que deben llevar). Revisa el texto.";
-            } else {
-                // Le faltó borrar algo
-                iconoCont.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 bg-yellow-100 text-yellow-600";
-                iconoCont.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-                titulo.innerText = "Casi lo tienes";
-                titulo.className = "text-2xl font-bold mb-2 text-yellow-600";
-                mensaje.innerText = "Aún quedan detalles en el texto que no aportan valor para el propósito del correo y solo añaden 'ruido'. Intenta eliminar las excusas o anécdotas personales.";
+            // Load options
+            for(let i=0; i<4; i++) {
+                document.getElementById(`option-${i}-text`).textContent = currentQ.options[i];
             }
 
-            // Mostrar el panel con animación
-            panel.classList.remove('hidden');
-            panel.classList.add('fade-in');
-            
-            // Scroll hacia el resultado
-            setTimeout(() => {
-                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            canAnswer = true;
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeRemaining = TIME_PER_QUESTION;
+            timerBar.style.width = '100%';
+            timerBar.style.backgroundColor = '#a855f7'; // Purple
+
+            timerInterval = setInterval(() => {
+                timeRemaining -= 0.1; // update every 100ms for smoother bar
+                const percentage = (timeRemaining / TIME_PER_QUESTION) * 100;
+                timerBar.style.width = `${percentage}%`;
+
+                // Color change based on time
+                if (percentage < 40 && percentage > 20) timerBar.style.backgroundColor = '#eab308'; // Yellow
+                if (percentage <= 20) timerBar.style.backgroundColor = '#ef4444'; // Red
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    timerBar.style.width = '0%';
+                    handleTimeOut();
+                }
             }, 100);
         }
 
-        function reiniciarEjercicio() {
-            oraciones.forEach(o => o.tachada = false);
-            renderizarTexto();
-            document.getElementById('panel-resultados').classList.add('hidden');
-            document.getElementById('panel-resultados').classList.remove('fade-in');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function selectOption(index) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            clearInterval(timerInterval);
+            
+            const currentQ = questions[currentQuestionIndex];
+            const isCorrect = (index === currentQ.correctIndex);
+            
+            showFeedback(isCorrect, currentQ);
         }
 
-        // Inicializar al cargar
-        window.onload = renderizarTexto;
+        function handleTimeOut() {
+            if (!canAnswer) return;
+            canAnswer = false;
+            const currentQ = questions[currentQuestionIndex];
+            showFeedback(false, currentQ, true);
+        }
 
+        function showFeedback(isCorrect, questionObj, isTimeOut = false) {
+            hideAllScreens();
+            screens.feedback.classList.remove('hidden');
+            
+            // Re-trigger animation
+            const content = screens.feedback.querySelector('.relative');
+            content.classList.remove('animate-pop');
+            void content.offsetWidth;
+            content.classList.add('animate-pop');
+
+            correctAnswerText.classList.add('hidden');
+
+            if (isCorrect) {
+                // Calculate points based on time left (max 1000)
+                const points = Math.round((timeRemaining / TIME_PER_QUESTION) * 500) + 500;
+                score += points;
+                updateScoreDisplay();
+                
+                feedbackBg.className = 'absolute inset-0 opacity-95 transition-colors duration-300 bg-green-500';
+                feedbackTitle.textContent = '¡Correcto!';
+                feedbackPoints.textContent = `+${points}`;
+                feedbackPoints.classList.remove('hidden');
+            } else {
+                feedbackBg.className = 'absolute inset-0 opacity-95 transition-colors duration-300 bg-red-500';
+                feedbackTitle.textContent = isTimeOut ? '¡Tiempo Agotado!' : '¡Incorrecto!';
+                feedbackPoints.classList.add('hidden');
+                
+                // Show correct answer
+                correctAnswerText.textContent = `Respuesta correcta: ${questionObj.options[questionObj.correctIndex]}`;
+                correctAnswerText.classList.remove('hidden');
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            hideAllScreens();
+            screens.end.classList.remove('hidden');
+            scoreDisplay.classList.add('hidden');
+            document.getElementById('final-score').textContent = score;
+        }
+
+        function resetGame() {
+            hideAllScreens();
+            screens.start.classList.remove('hidden');
+            score = 0;
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `${score} Pts`;
+            // Add a little pop effect to score
+            scoreDisplay.classList.remove('animate-pop');
+            void scoreDisplay.offsetWidth;
+            scoreDisplay.classList.add('animate-pop');
+        }
     </script>
 </body>
 </html>
